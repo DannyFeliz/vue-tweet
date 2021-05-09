@@ -1,8 +1,8 @@
 <template>
   <TweetEmbed
     class="my-custom-class"
-    tweet-id="20"
-    :options="{ lang: 'es' }"
+    tweetId="20"
+    :options="{ lang: 'es', theme: 'dark' }"
     :onTweetLoadError="onTweetLoadError"
     :onTweetLoadSuccess="onTweetLoadSuccess"
   >
@@ -30,7 +30,7 @@ export default defineComponent({
       console.log(element)
     },
     onTweetLoadError() {
-      console.log("YR")
+      console.log("Ops... an error has occurred.")
     }
   }
 })
