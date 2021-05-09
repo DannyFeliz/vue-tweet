@@ -60,29 +60,19 @@ export default defineComponent({
     })
 
     onMounted(() => {
-      loadTweet();
+      renderTweet();
     })
 
     watch([tweetId, options], () => {
-      loadTweet();
+      renderTweet();
     })
 
-    function addScript(src: string, cb: () => any) {
-      const s = document.createElement('script');
-      s.setAttribute('src', src);
-      s.addEventListener('load', () => cb(), false);
-      document.body.appendChild(s);
-    }
-
-    function loadTweet() {
-      if (!(window['twttr'] && window['twttr'].ready)) {
-        addScript(`https://platform.twitter.com/widgets.js`, renderTweet);
-      } else {
-        renderTweet();
-      }
-    }
-
     function renderTweet() {
+      if (!(window['twttr'] && window['twttr'].ready)) {
+        addScript("https://platform.twitter.com/widgets.js", renderTweet);
+        return;
+      }
+
       window['twttr'].ready().then(({ widgets }: any) => {
         isLoading.value = true;
         hasError.value = false;
@@ -103,9 +93,17 @@ export default defineComponent({
               hasError.value = true;
               onTweetLoadError?.value && onTweetLoadError.value();
             }
+
             isLoading.value = false;
           })
       })
+    }
+
+    function addScript(src: string, cb: () => any) {
+      const s = document.createElement('script');
+      s.setAttribute('src', src);
+      s.addEventListener('load', () => cb(), false);
+      document.body.appendChild(s);
     }
 
     return { tweetContainer, isLoading, hasError, attrs }
