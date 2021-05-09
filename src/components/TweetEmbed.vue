@@ -99,7 +99,7 @@ export default defineComponent({
       })
     }
 
-    function addScript(src: string, cb: () => any) {
+    function addScript(src: string, cb: () => void) {
       const s = document.createElement('script');
       s.setAttribute('src', src);
       s.addEventListener('load', () => cb(), false);
