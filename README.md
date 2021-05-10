@@ -24,7 +24,7 @@ yarn add vue-tweet
 ```vue
 <template>
   <Tweet
-    tweetId="1370027087818461184"
+    tweet-id="1370027087818461184"
     cards="visible"
     conversation="all"
     lang="en"
@@ -71,7 +71,7 @@ export default defineComponent({
 
 # Props - [Embedded Tweet parameter reference](https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
 
-**id**
+**tweet-id**
 
 Type: `string`
 
