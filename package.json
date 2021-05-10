@@ -1,10 +1,22 @@
 {
-  "name": "vue-tweet-embed",
+  "name": "vue-tweet",
   "version": "0.0.0",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/vue-tweet.umd.js",
+  "module": "./dist/vue-tweet.es.js",
+  "exports": {
+    ".": {
+      "import": "./dist/vue-tweet.es.js",
+      "require": "./dist/vue-tweet.umd.js"
+    }
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build",
-    "serve": "vite preview"
+    "build": "vue-tsc --noEmit && vite build && npm run generate-types",
+    "serve": "vite preview",
+    "generate-types": "vue-dts-gen src/components/vue-tweet.vue --outDir dist"
   },
   "dependencies": {
     "vue": "^3.0.11"
@@ -14,6 +26,27 @@
     "@vue/compiler-sfc": "^3.0.11",
     "typescript": "^4.1.3",
     "vite": "^2.2.4",
+    "vue-dts-gen": "^0.2.3",
     "vue-tsc": "^0.0.24"
+  },
+  "keywords": [
+    "vue",
+    "vue-2",
+    "vue-3",
+    "vue-tweet",
+    "vue-tweet",
+    "twitter-tweet",
+    "embed",
+    "twitter",
+    "twitter-widget",
+    "twitter-embed",
+    "vue-tweet"
+  ],
+  "author": "Danny Feliz <dannyfeliz08@gmail.com>",
+  "license": "MIT",
+  "bugs": "https://github.com/DannyFeliz/vue-tweet/issues/new",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DannyFeliz/vue-tweet"
   }
 }
