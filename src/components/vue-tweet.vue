@@ -8,16 +8,6 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, PropType, nextTick, watch } from "vue";
 
-export interface TweetEmbedOptions {
-  conversation?: "none" | "all";
-  cards?: "visible" | "hidden";
-  width?: "auto" | number;
-  align?: undefined | "left" | "right" | "center";
-  theme?: "light" | "dark";
-  lang?: "ar" | "bn" | "cs" | "da" | "de" | "el" | "en" | "es" | "fa" | "fi" | "fil" | "fr" | "he" | "hi" | "hu" | "id" | "it" | "ja" | "ko" | "msa" | "nl" | "no" | "pl" | "pt" | "ro" | "ru" | "sv" | "th" | "tr" | "uk" | "ur" | "vi" | "zh-cn" | "zh-tw";
-  dnt?: boolean
-}
-
 export default defineComponent({
   props: {
     tweetId: {
@@ -86,7 +76,7 @@ export default defineComponent({
           .createTweet(tweetId, tweetContainer.value, options)
           .then(async (twitterWidgetElement: HTMLElement | undefined) => {
             // Since we're mutating the DOM directly with the embed we need to tell Vue wait until the DOM update
-            await nextTick()
+            await nextTick();
 
             if (twitterWidgetElement) {
               emit("tweet-load-success", twitterWidgetElement);
