@@ -21,14 +21,25 @@
   </TweetEmbed>
 </template>
 
-<script lang="ts" setup>
+<script lang="ts">
+import { defineComponent } from "vue";
 import TweetEmbed from "./components/vue-tweet.vue"
 
-function onTweetLoadSuccess(embedNode: HTMLElement) {
-  console.log(embedNode);
-}
+export default defineComponent({
+  components: {
+    TweetEmbed
+  },
+  setup() {
+    function onTweetLoadSuccess(embedNode: HTMLElement) {
+      console.log(embedNode);
+    }
 
-function onTweetLoadError() {
-  console.log("Ops... an error has occurred");
-}
+    function onTweetLoadError() {
+      console.log("Ops... an error has occurred");
+    }
+
+    return { onTweetLoadSuccess, onTweetLoadError }
+  }
+})
+
 </script>
