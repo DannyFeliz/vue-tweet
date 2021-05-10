@@ -1,9 +1,11 @@
 {
   "name": "vue-tweet",
+  "description": "Embed tweets just by giving the ID of a Tweet",
   "version": "1.0.1",
   "files": [
     "dist"
   ],
+  "types": "./dist/vue-tweet.d.ts",
   "main": "./dist/vue-tweet.umd.js",
   "module": "./dist/vue-tweet.es.js",
   "exports": {
