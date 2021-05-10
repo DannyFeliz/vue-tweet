@@ -18,7 +18,9 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build && npm run generate-types",
     "serve": "vite preview",
-    "generate-types": "vue-dts-gen src/components/vue-tweet.vue --outDir dist"
+    "generate-types": "vue-dts-gen src/components/vue-tweet.vue --outDir dist",
+    "generate-tag": "np --no-2fa --no-tests --no-cleanup --no-publish",
+    "publish": "npm run build && npm publish --access public"
   },
   "dependencies": {
     "vue": "^3.0.11"
