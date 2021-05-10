@@ -51,15 +51,15 @@ import Tweet from 'vue-tweet'
 
 export default defineComponent({
   components: {
-    TweetEmbed
+    Tweet
   },
   setup() {
     function onTweetLoadSuccess(embedNode) {
-      console.log(embedNode);
+      console.log(embedNode)
     }
 
     function onTweetLoadError() {
-      console.log("Ops... an error has occurred");
+      console.log("Ops... an error has occurred")
     }
 
     return { onTweetLoadSuccess, onTweetLoadError }
