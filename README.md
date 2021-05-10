@@ -7,6 +7,8 @@ Embed tweets just by giving the ID of a Tweet
 
 This project was developed using Vue 3 + Typescript + Vite 🚀
 
+## Demo
+
 [![Edit Demo vue-tweet](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-tweet-embed-demo-sue23?file=/src/App.vue)
 
 ## Installation
