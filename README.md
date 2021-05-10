@@ -43,7 +43,7 @@ yarn add vue-tweet
 
 <script>
 import { defineComponent } from 'vue'
-import Tweet from 'vue-tweet.vue'
+import Tweet from 'vue-tweet'
 
 export default defineComponent({
   components: {
