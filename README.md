@@ -68,6 +68,8 @@ export default defineComponent({
 
 Type: `string`
 
+`Required`
+
 The numerical ID of the desired Tweet.
 
 **cards**
