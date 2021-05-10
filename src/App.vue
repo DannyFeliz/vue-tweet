@@ -1,10 +1,15 @@
 <template>
   <TweetEmbed
-    class="my-custom-class"
-    tweetId="20"
-    :options="{ lang: 'es', theme: 'dark' }"
-    :onTweetLoadError="onTweetLoadError"
-    :onTweetLoadSuccess="onTweetLoadSuccess"
+    tweetId="1370027087818461184"
+    cards="visible"
+    conversation="all"
+    lang="en"
+    theme="light"
+    align="left"
+    :width="400"
+    :dnt="false"
+    @tweet-load-error="onTweetLoadError"
+    @tweet-load-success="onTweetLoadSuccess"
   >
     <template v-slot:loading>
       <span>Loading...</span>
@@ -16,22 +21,14 @@
   </TweetEmbed>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
-import TweetEmbed from './components/TweetEmbed.vue'
+<script lang="ts" setup>
+import TweetEmbed from "./components/vue-tweet.vue"
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    TweetEmbed
-  },
-  methods: {
-    onTweetLoadSuccess(element: HTMLElement) {
-      console.log(element)
-    },
-    onTweetLoadError() {
-      console.log("Ops... an error has occurred.")
-    }
-  }
-})
+function onTweetLoadSuccess(embedNode: HTMLElement) {
+  console.log(embedNode);
+}
+
+function onTweetLoadError() {
+  console.log("Ops... an error has occurred");
+}
 </script>
