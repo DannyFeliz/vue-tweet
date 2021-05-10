@@ -5,6 +5,8 @@ Embed tweets just by giving the ID of a Tweet
 [<img src="https://img.shields.io/npm/dt/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 [<img src="https://img.shields.io/npm/v/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 
+This project is using Vue 3 + Typescript + Vite
+
 ## Installation
 
 ```bash
@@ -198,8 +200,6 @@ npm run build
 ```
 npm run serve
 ```
-
-This project is using Vue 3 + Typescript + Vite
 
 ## Recommended IDE Setup
 
