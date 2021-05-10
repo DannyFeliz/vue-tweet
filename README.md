@@ -5,7 +5,9 @@ Embed tweets just by giving the ID of a Tweet
 [<img src="https://img.shields.io/npm/dt/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 [<img src="https://img.shields.io/npm/v/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 
-This project is using Vue 3 + Typescript + Vite
+This project was developed using Vue 3 + Typescript + Vite 🚀
+
+[![Edit Demo vue-tweet](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-tweet-embed-demo-sue23?file=/src/App.vue)
 
 ## Installation
 
@@ -49,15 +51,18 @@ import Tweet from 'vue-tweet'
 
 export default defineComponent({
   components: {
-    Tweet
+    TweetEmbed
   },
-  methods: {
-    onTweetLoadSuccess(embedHtmlElement) {
-      console.log(embedHtmlElement)
-    },
-    onTweetLoadError() {
-      console.log("Ops... an error has occurred")
+  setup() {
+    function onTweetLoadSuccess(embedNode) {
+      console.log(embedNode);
     }
+
+    function onTweetLoadError() {
+      console.log("Ops... an error has occurred");
+    }
+
+    return { onTweetLoadSuccess, onTweetLoadError }
   }
 })
 </script>
