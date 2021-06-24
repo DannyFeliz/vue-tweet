@@ -72,6 +72,7 @@ export default defineComponent({
 ```
 
 # Props - [Embedded Tweet parameter reference](https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
+<hr>
 
 **tweet-id**
 
@@ -80,6 +81,8 @@ Type: `string`
 `Required`
 
 The numerical ID of the desired Tweet.
+
+<hr>
 
 **cards**
 
@@ -91,6 +94,8 @@ Values: `"visible" | "hidden"`
 
 When set to hidden, links in a Tweet are not expanded to photo, video, or link previews.
 
+<hr>
+
 **conversation**
 
 Type: `string`
@@ -100,6 +105,8 @@ Default: `"all"`
 Values: `"all" | "none"`
 
 When set to none, only the cited Tweet will be displayed even if it is in reply to another Tweet.
+
+<hr>
 
 **theme**
 
@@ -111,6 +118,8 @@ Values: `"light" | "dark"`
 
 When set to dark, displays Tweet with light text over a dark background.
 
+<hr>
+
 **width**
 
 Type: `string | number`
@@ -120,6 +129,8 @@ Default: `"auto"`
 Values: `"auto" | number`
 
 The maximum width of the rendered Tweet in whole pixels. This value should be between `250` and `550` pixels.
+
+<hr>
 
 **align**
 
@@ -131,6 +142,8 @@ Values: `"left" | "right" | "center" | undefined`
 
 Float the Tweet left, right, or center relative to its container. Typically set to allow text or other content to wrap around the Tweet.
 
+<hr>
+
 **lang**
 
 Type: `string`
@@ -140,6 +153,8 @@ Default: `en`
 Values: `"ar" | "bn" | "cs" | "da" | "de" | "el" | "en" | "es" | "fa" | "fi" | "fil" | "fr" | "he" | "hi" | "hu" | "id" | "it" | "ja" | "ko" | "msa" | "nl" | "no" | "pl" | "pt" | "ro" | "ru" | "sv" | "th" | "tr" | "uk" | "ur" | "vi" | "zh-cn" | "zh-tw"`
 
 A supported Twitter language code. Loads text components in the specified language. Note: does not affect the text of the cited Tweet.
+
+<hr>
 
 **dnt**
 
@@ -158,6 +173,8 @@ Attributes: `(embedHtmlNode)`
 
 Emitted after successfully load the tweet.
 
+<hr>
+
 **tweet-load-error**
 
 Emitted after an error occurs while trying to get the tweet
@@ -173,6 +190,8 @@ Slot for custom loading state.
     </template>
 </Tweet>
 ```
+
+<hr>
 
 **error**
 
