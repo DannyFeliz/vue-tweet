@@ -1,6 +1,6 @@
 # vue-tweet
 
-Embed tweets just by giving the ID of a Tweet
+Vue 3 component that let you embed tweets in your App by only giving the tweet id
 
 [<img src="https://img.shields.io/npm/dt/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 [<img src="https://img.shields.io/npm/v/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
