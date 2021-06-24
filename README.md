@@ -72,7 +72,6 @@ export default defineComponent({
 ```
 
 # Props - [Embedded Tweet parameter reference](https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
-<hr>
 
 **tweet-id**
 
