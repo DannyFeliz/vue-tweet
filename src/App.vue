@@ -31,10 +31,12 @@ export default defineComponent({
   },
   setup() {
     function onTweetLoadSuccess(embedNode: HTMLElement) {
+      console.log("onTweetLoadSuccess callback");
       console.log(embedNode);
     }
 
     function onTweetLoadError() {
+      console.log("onTweetLoadError callback");
       console.log("Ops... an error has occurred");
     }
 
