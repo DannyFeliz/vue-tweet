@@ -4,7 +4,6 @@
   <div ref="tweetContainer" v-bind="attrs"></div>
 </template>
 
-
 <script lang="ts">
 import { defineComponent, ref, onMounted, PropType, nextTick, watch } from "vue";
 
