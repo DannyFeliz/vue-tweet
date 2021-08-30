@@ -11,7 +11,7 @@ This project was developed using Vue 3 + Typescript + Vite 🚀
 
 [![Edit Demo vue-tweet](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-tweet-embed-demo-sue23?file=/src/App.vue)
 
-![image](https://user-images.githubusercontent.com/5460365/131345071-7d143b12-2d8d-4920-a231-d8b3acc21bb0.png)
+[![Preview](https://user-images.githubusercontent.com/5460365/131345071-7d143b12-2d8d-4920-a231-d8b3acc21bb0.png)](https://codesandbox.io/s/vue-tweet-embed-demo-sue23?file=/src/App.vue)
 
 ## Installation
 
