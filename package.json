@@ -23,21 +23,22 @@
     "publish": "npm run build && npm publish --access public"
   },
   "dependencies": {
-    "vue": "^3.0.11"
+    "vue": "^3.2.31"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^1.2.2",
-    "@vue/compiler-sfc": "^3.0.11",
-    "typescript": "^4.1.3",
-    "vite": "^2.2.4",
-    "vue-dts-gen": "^0.2.3",
-    "vue-tsc": "^0.0.24"
+    "@vitejs/plugin-vue": "^2.3.1",
+    "np": "^7.6.1",
+    "typescript": "^4.6.3",
+    "vite": "^2.9.0",
+    "vue-dts-gen": "^0.3.0",
+    "vue-tsc": "^0.33.9"
   },
   "keywords": [
     "vue",
     "vue-2",
     "vue-3",
     "vue-tweet",
+    "vue3-tweet",
     "vue-tweet",
     "twitter-tweet",
     "embed",
