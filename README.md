@@ -1,6 +1,6 @@
 # vue-tweet
 
-Vue 3 component that let you embed tweets in your App by only giving the tweet id
+Vue 3 component that lets you embed tweets in your App by only giving the tweet id
 
 [<img src="https://img.shields.io/npm/dt/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 [<img src="https://img.shields.io/npm/v/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
@@ -27,50 +27,12 @@ yarn add vue-tweet
 
 ```vue
 <template>
-  <Tweet
-    tweet-id="1370027087818461184"
-    cards="visible"
-    conversation="all"
-    lang="en"
-    theme="light"
-    align="left"
-    :width="400"
-    :dnt="false"
-    @tweet-load-error="onTweetLoadError"
-    @tweet-load-success="onTweetLoadSuccess"
-  >
-    <template v-slot:loading>
-      <span>Loading...</span>
-    </template>
-
-    <template v-slot:error>
-      <span>Sorry, that tweet doesn’t exist!</span>
-    </template>
-  </Tweet>
+  <Tweet tweet-id="1370027087818461184" />
 </template>
 
-<script>
-import { defineComponent } from 'vue'
-import Tweet from 'vue-tweet'
-
-export default defineComponent({
-  components: {
-    Tweet
-  },
-  setup() {
-    function onTweetLoadSuccess(embedNode) {
-      console.log(embedNode)
-    }
-
-    function onTweetLoadError() {
-      console.log("Ops... an error has occurred")
-    }
-
-    return { onTweetLoadSuccess, onTweetLoadError }
-  }
-})
+<script setup>
+import Tweet from "vue-tweet";
 </script>
-
 ```
 
 # Props - [Embedded Tweet parameter reference](https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
@@ -166,6 +128,7 @@ Default: `false`
 When set to true, the Tweet and its embedded page on your site are not used for purposes that include personalized suggestions and personalized ads.
 
 # Events
+
 **tweet-load-success**
 
 Type: `HTMLElement`
@@ -179,11 +142,13 @@ Emitted after successfully load the tweet.
 **tweet-load-error**
 
 Emitted after an error occurs while trying to get the tweet
+
 # Slots
 
 **loading**
 
 Slot for custom loading state.
+
 ```vue
 <Tweet tweetId="20">
     <template v-slot:loading>
@@ -197,6 +162,7 @@ Slot for custom loading state.
 **error**
 
 Slot for custom error state.
+
 ```vue
 <Tweet tweetId="20">
     <template v-slot:error>
@@ -222,6 +188,7 @@ npm run dev
 ```
 npm run build
 ```
+
 ### Locally preview production build
 
 ```
@@ -262,4 +229,3 @@ See [Configuration Reference](https://vitejs.dev/guide/#command-line-interface).
 3. Commit your changes (`git commit -am "Add some fooBar"`)
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
-
