@@ -9,9 +9,9 @@ This project was developed using Vue 3 + Typescript + Vite 🚀
 
 ## Demo
 
-[![Edit Demo vue-tweet](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/vue-tweet-embed-demo-sue23?file=/src/App.vue)
+[![Edit Demo vue-tweet](https://user-images.githubusercontent.com/5460365/161323040-d73231f8-db73-48ef-adab-433558502585.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
 
-[![Preview](https://user-images.githubusercontent.com/5460365/131345071-7d143b12-2d8d-4920-a231-d8b3acc21bb0.png)](https://codesandbox.io/s/vue-tweet-embed-demo-sue23?file=/src/App.vue)
+[![Preview](https://user-images.githubusercontent.com/5460365/131345071-7d143b12-2d8d-4920-a231-d8b3acc21bb0.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
 
 ## Installation
 
@@ -26,13 +26,13 @@ yarn add vue-tweet
 ## Usage
 
 ```vue
-<template>
-  <Tweet tweet-id="1370027087818461184" />
-</template>
-
 <script setup>
 import Tweet from "vue-tweet";
 </script>
+
+<template>
+  <Tweet tweet-id="1370027087818461184" />
+</template>
 ```
 
 # Props - [Embedded Tweet parameter reference](https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
