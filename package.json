@@ -16,12 +16,12 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc --noEmit && vite build && npm run generate-types",
+    "build": "vite build",
     "serve": "vite preview",
     "lint": "vue-tsc --noEmit",
     "generate-types": "vue-dts-gen src/components/vue-tweet.vue --outDir dist",
     "generate-tag": "np --no-2fa --no-tests --no-cleanup --no-publish",
-    "publish": "npm run build && npm publish --access public",
+    "publish": "npm run lint && npm run generate-types && npm run build && npm run generate-tag && npm publish --access public",
     "prepare": "husky install"
   },
   "dependencies": {
