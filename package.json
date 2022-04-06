@@ -60,6 +60,6 @@
     "url": "https://github.com/DannyFeliz/vue-tweet"
   },
   "lint-staged": {
-    "*.{vue}": "npm run lint"
+    "*.vue": "npm run lint"
   }
 }
