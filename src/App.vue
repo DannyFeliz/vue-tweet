@@ -23,13 +23,11 @@
 
 <script setup lang="ts">
 import TweetEmbed from "./components/vue-tweet.vue"
-function onTweetLoadSuccess(embedNode: HTMLElement) {
-  console.log("onTweetLoadSuccess callback");
-  console.log(embedNode);
+function onTweetLoadSuccess(embedNode: HTMLDivElement) {
+  console.log("onTweetLoadSuccess callback", embedNode);
 }
 
 function onTweetLoadError() {
   console.log("onTweetLoadError callback");
-  console.log("Ops... an error has occurred");
 }
 </script>
