@@ -7,11 +7,18 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, PropType, nextTick, watch } from "vue";
 const langs = ["ar", "bn", "cs", "da", "de", "el", "en", "es", "fa", "fi", "fil", "fr", "he", "hi", "hu", "id", "it", "ja", "ko", "msa", "nl", "no", "pl", "pt", "ro", "ru", "sv", "th", "tr", "uk", "ur", "vi", "zh-cn", "zh-tw"] as const;
+const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?twitter\.com\/.*\/status(?:es)?\/(?<tweetId>[^\/\?]\d+)$/i;
 
 export default defineComponent({
   props: {
     /**
-     * The numerical ID of the desired Tweet.
+     The numerical ID of the desired Tweet or the Tweet URL.
+     
+     @example
+       <TweetEmbed tweetId="20" />
+
+     @example
+       <TweetEmbed tweetId="https://twitter.com/jack/status/20" />
      */
     tweetId: {
       type: String,
@@ -90,7 +97,10 @@ export default defineComponent({
       default: false
     }
   },
-  emits: ["tweet-load-success", "tweet-load-error"],
+  emits: {
+    "tweet-load-success": (twitterWidgetElement: HTMLDivElement) => !!twitterWidgetElement,
+    "tweet-load-error": () => true,
+  },
   setup(props, { attrs, emit }) {
     const isLoading = ref<boolean>(true);
     const hasError = ref<boolean>(false);
@@ -118,7 +128,12 @@ export default defineComponent({
           tweetContainerRef.value.innerHTML = "";
         }
 
-        const { tweetId, ...options } = props;
+        let { tweetId, ...options } = props;
+        const match = tweetId.trim().match(TWEET_URL_REGEX);
+        if (match) {
+          tweetId = match.groups?.tweetId as string;
+        }
+
         widgets
           .createTweet(tweetId, tweetContainerRef.value, options)
           .then(async (twitterWidgetElement: HTMLDivElement | undefined) => {
@@ -131,7 +146,8 @@ export default defineComponent({
               hasError.value = true;
               emit("tweet-load-error");
             }
-
+          })
+          .finally(() => {
             isLoading.value = false;
           })
       })

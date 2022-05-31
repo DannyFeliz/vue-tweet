@@ -31,7 +31,21 @@ import Tweet from "vue-tweet";
 </script>
 
 <template>
-  <Tweet tweet-id="1370027087818461184" />
+  <Tweet tweet-id="1530240085807054848" />
+</template>
+```
+
+Or using a tweet URL
+
+```vue
+<script setup>
+import Tweet from "vue-tweet";
+</script>
+
+<template>
+  <Tweet
+    tweet-id="https://twitter.com/DannyFeliz08/status/1530240085807054848"
+  />
 </template>
 ```
 
@@ -43,9 +57,9 @@ Type: `string`
 
 `Required`
 
-The numerical ID of the desired Tweet.
+The numerical ID of the desired Tweet or the Tweet URL.
 
-<hr>
+<hr />
 
 **cards**
 
@@ -57,7 +71,7 @@ Values: `"visible" | "hidden"`
 
 When set to hidden, links in a Tweet are not expanded to photo, video, or link previews.
 
-<hr>
+<hr />
 
 **conversation**
 
@@ -69,7 +83,7 @@ Values: `"all" | "none"`
 
 When set to none, only the cited Tweet will be displayed even if it is in reply to another Tweet.
 
-<hr>
+<hr />
 
 **theme**
 
@@ -81,7 +95,7 @@ Values: `"light" | "dark"`
 
 When set to dark, displays Tweet with light text over a dark background.
 
-<hr>
+<hr />
 
 **width**
 
@@ -93,7 +107,7 @@ Values: `"auto" | number`
 
 The maximum width of the rendered Tweet in whole pixels. This value should be between `250` and `550` pixels.
 
-<hr>
+<hr />
 
 **align**
 
@@ -105,7 +119,7 @@ Values: `"left" | "right" | "center" | undefined`
 
 Float the Tweet left, right, or center relative to its container. Typically set to allow text or other content to wrap around the Tweet.
 
-<hr>
+<hr />
 
 **lang**
 
@@ -117,7 +131,7 @@ Values: `"ar" | "bn" | "cs" | "da" | "de" | "el" | "en" | "es" | "fa" | "fi" | "
 
 A supported Twitter language code. Loads text components in the specified language. Note: does not affect the text of the cited Tweet.
 
-<hr>
+<hr />
 
 **dnt**
 
@@ -137,7 +151,7 @@ Attributes: `(embedHtmlNode)`
 
 Emitted after successfully load the tweet.
 
-<hr>
+<hr />
 
 **tweet-load-error**
 
@@ -157,7 +171,7 @@ Slot for custom loading state.
 </Tweet>
 ```
 
-<hr>
+<hr />
 
 **error**
 
@@ -199,25 +213,6 @@ npm run serve
 
 [VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
 
-### If Using `<script setup>`
-
-[`<script setup>`](https://github.com/vuejs/rfcs/pull/227) is a feature that is currently in RFC stage. To get proper IDE support for the syntax, use [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) instead of Vetur (and disable Vetur).
-
-## Type Support For `.vue` Imports in TS
-
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can use the following:
-
-### If Using Volar
-
-Run `Volar: Switch TS Plugin on/off` from VSCode command palette.
-
-### If Using Vetur
-
-1. Install and add `@vuedx/typescript-plugin-vue` to the [plugins section](https://www.typescriptlang.org/tsconfig#plugins) in `tsconfig.json`
-2. Delete `src/shims-vue.d.ts` as it is no longer needed to provide module info to Typescript
-3. Open `src/main.ts` in VSCode
-4. Open the VSCode command palette 5. Search and run "Select TypeScript version" -> "Use workspace version"
-
 ### Customize configuration
 
 See [Configuration Reference](https://vitejs.dev/guide/#command-line-interface).
@@ -229,4 +224,3 @@ See [Configuration Reference](https://vitejs.dev/guide/#command-line-interface).
 3. Commit your changes (`git commit -am "Add some fooBar"`)
 4. Push to the branch (`git push origin feature/fooBar`)
 5. Create a new Pull Request
-
