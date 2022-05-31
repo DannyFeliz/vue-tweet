@@ -11,7 +11,7 @@ This project was developed using Vue 3 + Typescript + Vite 🚀
 
 [![Edit Demo vue-tweet](https://user-images.githubusercontent.com/5460365/161323040-d73231f8-db73-48ef-adab-433558502585.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
 
-[![Preview](https://user-images.githubusercontent.com/5460365/131345071-7d143b12-2d8d-4920-a231-d8b3acc21bb0.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
+[![Preview](https://user-images.githubusercontent.com/5460365/171073819-e6e97952-a851-48cd-80f8-d72489efd57b.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
 
 ## Installation
 
@@ -44,20 +44,32 @@ import Tweet from "vue-tweet";
 
 <template>
   <Tweet
-    tweet-id="https://twitter.com/DannyFeliz08/status/1530240085807054848"
+    tweet-url="https://twitter.com/DannyFeliz08/status/1530240085807054848"
   />
 </template>
 ```
 
 # Props - [Embedded Tweet parameter reference](https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
 
+### Note: You must provide either `tweet-id` or `tweet-url`.
+
 **tweet-id**
 
 Type: `string`
 
-`Required`
+Default: `''`
 
-The numerical ID of the desired Tweet or the Tweet URL.
+The numerical ID of the desired Tweet.
+
+<hr />
+
+**tweet-url**
+
+Type: `string`
+
+Default: `''`
+
+The Tweet URL.
 
 <hr />
 

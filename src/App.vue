@@ -1,6 +1,6 @@
 <template>
   <TweetEmbed
-    tweetId="1530240085807054848"
+    tweet-url="https://twitter.com/DannyFeliz08/status/1530240085807054848"
     cards="visible"
     conversation="all"
     lang="en"
