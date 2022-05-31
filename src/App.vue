@@ -1,6 +1,6 @@
 <template>
   <TweetEmbed
-    tweetId="1370027087818461184"
+    tweetId="1530240085807054848"
     cards="visible"
     conversation="all"
     lang="en"
@@ -23,6 +23,7 @@
 
 <script setup lang="ts">
 import TweetEmbed from "./components/vue-tweet.vue"
+
 function onTweetLoadSuccess(embedNode: HTMLDivElement) {
   console.log("onTweetLoadSuccess callback", embedNode);
 }
