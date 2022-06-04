@@ -5,7 +5,7 @@
   "files": [
     "dist"
   ],
-  "types": "./dist/vue-tweet.d.ts",
+  "types": "./dist/vue-tweet.vue.d.ts",
   "main": "./dist/vue-tweet.umd.js",
   "module": "./dist/vue-tweet.es.js",
   "exports": {
