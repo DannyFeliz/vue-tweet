@@ -9,7 +9,7 @@ This project was developed using Vue 3 + Typescript + Vite 🚀
 
 ## Demo
 
-[![Edit Demo vue-tweet](https://user-images.githubusercontent.com/5460365/161323040-d73231f8-db73-48ef-adab-433558502585.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
 
 [![Preview](https://user-images.githubusercontent.com/5460365/171073819-e6e97952-a851-48cd-80f8-d72489efd57b.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
 
