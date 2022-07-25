@@ -7,7 +7,7 @@ specifiers:
   lint-staged: 13.0.3
   np: 7.6.2
   typescript: 4.7.4
-  vite: 3.0.2
+  vite: 3.0.3
   vue: ^3.2.36
   vue-tsc: 0.39.0
 
@@ -16,12 +16,12 @@ dependencies:
 
 devDependencies:
   '@babel/types': 7.18.9
-  '@vitejs/plugin-vue': 3.0.1_vite@3.0.2+vue@3.2.36
+  '@vitejs/plugin-vue': 3.0.1_vite@3.0.3+vue@3.2.36
   husky: 8.0.1
   lint-staged: 13.0.3
   np: 7.6.2
   typescript: 4.7.4
-  vite: 3.0.2
+  vite: 3.0.3
   vue-tsc: 0.39.0_typescript@4.7.4
 
 packages:
@@ -173,14 +173,14 @@ packages:
       '@types/node': 17.0.36
     dev: true
 
-  /@vitejs/plugin-vue/3.0.1_vite@3.0.2+vue@3.2.36:
+  /@vitejs/plugin-vue/3.0.1_vite@3.0.3+vue@3.2.36:
     resolution: {integrity: sha512-Ll9JgxG7ONIz/XZv3dssfoMUDu9qAnlJ+km+pBA0teYSXzwPCIzS/e1bmwNYl5dcQGs677D21amgfYAnzMl17A==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^3.0.0
       vue: ^3.2.25
     dependencies:
-      vite: 3.0.2
+      vite: 3.0.3
       vue: 3.2.36
     dev: true
 
@@ -3077,8 +3077,8 @@ packages:
       builtins: 1.0.3
     dev: true
 
-  /vite/3.0.2:
-    resolution: {integrity: sha512-TAqydxW/w0U5AoL5AsD9DApTvGb2iNbGs3sN4u2VdT1GFkQVUfgUldt+t08TZgi23uIauh1TUOQJALduo9GXqw==}
+  /vite/3.0.3:
+    resolution: {integrity: sha512-sDIpIcl3mv1NUaSzZwiXGEy1ZoWwwC2vkxUHY6yiDacR6zf//ZFuBJrozO62gedpE43pmxnLATNR5IYUdAEkMQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
