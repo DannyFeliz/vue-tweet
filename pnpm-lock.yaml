@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@babel/types': 7.18.9
-  '@vitejs/plugin-vue': 3.0.1
+  '@vitejs/plugin-vue': 3.2.0
   husky: 8.0.1
   lint-staged: 13.0.3
   np: 7.6.2
@@ -16,7 +16,7 @@ dependencies:
 
 devDependencies:
   '@babel/types': 7.18.9
-  '@vitejs/plugin-vue': 3.0.1_vite@3.0.4+vue@3.2.36
+  '@vitejs/plugin-vue': 3.2.0_vite@3.0.4+vue@3.2.36
   husky: 8.0.1
   lint-staged: 13.0.3
   np: 7.6.2
@@ -173,8 +173,8 @@ packages:
       '@types/node': 17.0.36
     dev: true
 
-  /@vitejs/plugin-vue/3.0.1_vite@3.0.4+vue@3.2.36:
-    resolution: {integrity: sha512-Ll9JgxG7ONIz/XZv3dssfoMUDu9qAnlJ+km+pBA0teYSXzwPCIzS/e1bmwNYl5dcQGs677D21amgfYAnzMl17A==}
+  /@vitejs/plugin-vue/3.2.0_vite@3.0.4+vue@3.2.36:
+    resolution: {integrity: sha512-E0tnaL4fr+qkdCNxJ+Xd0yM31UwMkQje76fsDVBBUCoGOUPexu2VDUYHL8P4CwV+zMvWw6nlRw19OnRKmYAJpw==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       vite: ^3.0.0
