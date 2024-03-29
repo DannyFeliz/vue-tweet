@@ -1,7 +1,7 @@
 <template>
-  <slot v-if="hasError" name="error"></slot>
-  <slot v-else-if="isLoading" name="loading"></slot>
-  <div ref="tweetContainerRef" v-bind="$attrs"></div>
+  <slot v-if="hasError" name="error" />
+  <slot v-else-if="isLoading" name="loading" />
+  <div ref="tweetContainerRef" v-bind="$attrs" />
 </template>
 
 <script lang="ts" setup>
