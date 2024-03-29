@@ -12,6 +12,7 @@ import {
   nextTick,
   watch,
 } from "vue";
+
 const langs = [
   "ar",
   "bn",
@@ -48,8 +49,6 @@ const langs = [
   "zh-cn",
   "zh-tw",
 ] as const;
-
-const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?twitter\.com\/.*\/status(?:es)?\/(?<tweetId>[^/?]\d+)$/i;
 
 const props = defineProps({
   /**
@@ -251,6 +250,8 @@ function getTweetParams() {
       );
     }
   } else if (tweetUrl) {
+    const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?twitter\.com\/.*\/status(?:es)?\/(?<tweetId>[^/?]\d+)$/i;
+
     const match = tweetUrl.trim().match(TWEET_URL_REGEX);
     if (match) {
       tweetId = match.groups?.tweetId as string;
