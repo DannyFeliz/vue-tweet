@@ -1,6 +1,6 @@
 <template>
-  <slot v-if="isLoading" name="loading"></slot>
-  <slot v-else-if="hasError" name="error"></slot>
+  <slot v-if="hasError" name="error"></slot>
+  <slot v-else-if="isLoading" name="loading"></slot>
   <div ref="tweetContainerRef" v-bind="attrs"></div>
 </template>
 
@@ -152,11 +152,11 @@ export default defineComponent({
   emits: {
     "tweet-load-success": (twitterWidgetElement: HTMLDivElement) =>
       !!twitterWidgetElement,
-    "tweet-load-error": () => true,
+    "tweet-load-error": (error: Error) => error,
   },
   setup(props, { attrs, emit }) {
-    const isLoading = ref<boolean>(true);
-    const hasError = ref<boolean>(false);
+    const isLoading = ref(true);
+    const hasError = ref(false);
     const tweetContainerRef = ref<HTMLDivElement>();
 
     onMounted(() => {
@@ -168,13 +168,9 @@ export default defineComponent({
     });
 
     function renderTweet(): void {
-      console.log(window["twttr"]?.ready)
       if (!(window["twttr"] && window["twttr"].ready)) {
-        console.log("should add it")
         addScript("https://platform.twitter.com/widgets.js", renderTweet);
         return;
-      } else {
-        console.log("already added")
       }
 
       window["twttr"].ready().then(({ widgets }: any) => {
@@ -197,7 +193,7 @@ export default defineComponent({
               emit("tweet-load-success", twitterWidgetElement);
             } else {
               hasError.value = true;
-              emit("tweet-load-error");
+              emit("tweet-load-error", new Error("Failed to load tweet."));
             }
           })
           .finally(() => {
@@ -209,11 +205,12 @@ export default defineComponent({
     function getTweetParams() {
       let { tweetId, tweetUrl, ...tweetOptions } = props;
 
+      let error: Error | null = null;
       if (tweetId && tweetUrl) {
-        throw new Error("Cannot provide both tweet-id and tweet-url.");
+        error = new Error("Cannot provide both tweet-id and tweet-url.");
       } else if (tweetId) {
         if (!/^\d+$/.test(tweetId)) {
-          throw new Error(
+          error = new Error(
             "Invalid tweet-id, please provide a valid numerical tweet-id."
           );
         }
@@ -222,10 +219,17 @@ export default defineComponent({
         if (match) {
           tweetId = match.groups?.tweetId as string;
         } else {
-          throw new Error("Invalid tweet-url.");
+          error = new Error("Invalid tweet-url.");
         }
       } else {
-        throw new Error("Must provide either tweet-id or tweet-url.");
+        error = new Error("Must provide either tweet-id or tweet-url.");
+      }
+
+      if (error) {
+        hasError.value = true;
+        isLoading.value = false;
+        emit("tweet-load-error", error);
+        throw error;
       }
 
       return {
