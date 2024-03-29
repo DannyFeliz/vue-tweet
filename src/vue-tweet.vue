@@ -276,9 +276,40 @@ function getTweetParams() {
 }
 
 function addScript(src: string, cb: () => void): void {
+  if (window['___$twitterScriptLoaded___'] === undefined) {
+    window['___$twitterScriptLoaded___'] = false;
+  }
+
+  if (window['___$twitterScriptLoaded___']) {
+    cb();
+    return;
+  }
+
+
+  if (window['___$twitterScriptLoading___'] === undefined) {
+    window['___$twitterScriptLoading___'] = false;
+  }
+
+  if (window['___$twitterScriptLoading___']) {
+    // If the script is currently being loaded, set up an interval to wait until it's loaded
+    const waitInterval = setInterval(() => {
+      if (window['___$twitterScriptLoaded___']) {
+        clearInterval(waitInterval);
+        cb();
+      }
+    }, 100);
+    return;
+  }
+
+  window['___$twitterScriptLoading___'] = true;
   const s = document.createElement("script");
   s.setAttribute("src", src);
-  s.addEventListener("load", () => cb(), false);
+  s.async = true;
+  s.addEventListener("load", () => {
+    window['___$twitterScriptLoaded___'] = true;
+    window['___$twitterScriptLoading___'] = false;
+    cb(); // Call the callback once the script is successfully loaded
+  }, false);
   document.body.appendChild(s);
 }
 </script>
