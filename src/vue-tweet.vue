@@ -11,6 +11,7 @@ import {
   type PropType,
   nextTick,
   watch,
+  toRef,
 } from "vue";
 
 const langs = [
@@ -198,8 +199,8 @@ onMounted(() => {
   renderTweet();
 });
 
-watch(props, () => {
-  renderTweet();
+watch(toRef(props), renderTweet, {
+  deep: true,
 });
 
 function renderTweet(): void {
