@@ -11,20 +11,32 @@ function onTweetLoadError(error: Error) {
   tweetError.value = error;
   console.log("onTweetLoadError callback", error);
 }
+
+const list = ref([
+  { id: "1753678159067881809", lang: 'en', theme: 'light' },
+  { id: "1773610951993950668", lang: 'en', theme: 'light' },
+  { id: "1773606396501623093", lang: 'en', theme: 'light' },
+  { id: "1773411988179210750", lang: 'en', theme: 'light' },
+  { id: "1773379914567188605", lang: 'en', theme: 'light' },
+]);
 </script>
 
 <template>
-    <vue-tweet
-      tweet-url="https://twitter.com/vuejs/status/1753678159067881809"
-      cards="visible"
-      conversation="all"
-      lang="en"
-      theme="light"
-      align="left"
-      :width="400"
-      :dnt="false"
-      @tweet-load-error="onTweetLoadError"
-      @tweet-load-success="onTweetLoadSuccess"
+  <input style="display: block;" v-for="tweet in list" :key="tweet.id" type="text" :value="tweet.theme" @input="tweet.theme = $event.target.value" />
+
+  <vue-tweet
+    v-for="{ id, lang, theme } in list"
+    :key="id"
+    :tweet-id="`${id}`"
+    cards="visible"
+    conversation="all"
+    :lang="lang"
+    :theme="theme"
+    align="left"
+    :width="400"
+    :dnt="false"
+    @tweet-load-error="onTweetLoadError"
+    @tweet-load-success="onTweetLoadSuccess"
     >
       <template v-slot:loading>
         <span>Loading...</span>
@@ -33,5 +45,5 @@ function onTweetLoadError(error: Error) {
       <template v-slot:error>
         <span>{{ tweetError?.message }}</span>
       </template>
-    </vue-tweet>
+  </vue-tweet>
 </template>
