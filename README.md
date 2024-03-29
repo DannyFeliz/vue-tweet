@@ -5,13 +5,11 @@ Vue 3 component that lets you embed tweets in your App by only giving the tweet 
 [<img src="https://img.shields.io/npm/dt/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 [<img src="https://img.shields.io/npm/v/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 
-This project was developed using Vue 3 + Typescript + Vite 🚀
-
 ## Demo
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
+[![Edit Vue Tweet](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/p/devbox/vue-tweet-vyv4jx?embed=1&file=%2Fsrc%2FApp.vue)
 
-[![Preview](https://user-images.githubusercontent.com/5460365/171073819-e6e97952-a851-48cd-80f8-d72489efd57b.png)](https://stackblitz.com/edit/vitejs-vite-c5qu9k?file=src/App.vue)
+[![Preview](https://user-images.githubusercontent.com/5460365/171073819-e6e97952-a851-48cd-80f8-d72489efd57b.png)](https://codesandbox.io/p/devbox/vue-tweet-vyv4jx?embed=1&file=%2Fsrc%2FApp.vue)
 
 ## Installation
 
