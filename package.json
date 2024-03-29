@@ -7,12 +7,12 @@
     "dist"
   ],
   "types": "./dist/vue-tweet.vue.d.ts",
-  "main": "./dist/vue-tweet.umd.js",
-  "module": "./dist/vue-tweet.es.js",
+  "main": "./dist/vue-tweet.umd.cjs",
+  "module": "./dist/vue-tweet.js",
   "exports": {
     ".": {
-      "import": "./dist/vue-tweet.es.js",
-      "require": "./dist/vue-tweet.umd.js"
+      "import": "./dist/vue-tweet.js",
+      "require": "./dist/vue-tweet.umd.cjs"
     }
   },
   "scripts": {
@@ -24,7 +24,7 @@
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
-    "publish": "npm run generate-types && npm run build && npm run generate-tag && npm publish --access public",
+    "publish-package": "npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
     "prepare": "husky install"
   },
   "dependencies": {
