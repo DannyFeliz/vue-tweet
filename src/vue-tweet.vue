@@ -11,6 +11,7 @@ import {
   type PropType,
   nextTick,
   watch,
+  toRef,
 } from "vue";
 
 const langs = [
@@ -125,7 +126,7 @@ const props = defineProps({
    * @default "light"
    */
   theme: {
-    type: String as PropType<"light" | "dark">,
+    type: String as PropType<"light" | "dark" | string>,
     default: "light",
     validator: (value: string) => ["light", "dark"].includes(value),
   },
@@ -134,7 +135,7 @@ const props = defineProps({
    * @default "en"
    */
   lang: {
-    type: String as PropType<typeof langs[number]>,
+    type: String as PropType<typeof langs[number] | string>,
     default: "en",
     validator: (value: typeof langs[number]) => [
       "ar",
@@ -198,8 +199,8 @@ onMounted(() => {
   renderTweet();
 });
 
-watch(props, () => {
-  renderTweet();
+watch(toRef(props), renderTweet, {
+  deep: true,
 });
 
 function renderTweet(): void {
@@ -276,9 +277,39 @@ function getTweetParams() {
 }
 
 function addScript(src: string, cb: () => void): void {
+  if (window['___$twitterScriptLoaded___'] === undefined) {
+    window['___$twitterScriptLoaded___'] = false;
+  }
+
+  if (window['___$twitterScriptLoaded___']) {
+    cb();
+    return;
+  }
+
+
+  if (window['___$twitterScriptLoading___'] === undefined) {
+    window['___$twitterScriptLoading___'] = false;
+  }
+
+  if (window['___$twitterScriptLoading___']) {
+    const waitInterval = setInterval(() => {
+      if (window['___$twitterScriptLoaded___']) {
+        clearInterval(waitInterval);
+        cb();
+      }
+    }, 100);
+    return;
+  }
+
+  window['___$twitterScriptLoading___'] = true;
   const s = document.createElement("script");
   s.setAttribute("src", src);
-  s.addEventListener("load", () => cb(), false);
+  s.async = true;
+  s.addEventListener("load", () => {
+    window['___$twitterScriptLoaded___'] = true;
+    window['___$twitterScriptLoading___'] = false;
+    cb();
+  }, false);
   document.body.appendChild(s);
 }
 </script>
