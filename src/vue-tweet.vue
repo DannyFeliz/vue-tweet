@@ -126,7 +126,7 @@ const props = defineProps({
    * @default "light"
    */
   theme: {
-    type: String as PropType<"light" | "dark">,
+    type: String as PropType<"light" | "dark" | string>,
     default: "light",
     validator: (value: string) => ["light", "dark"].includes(value),
   },
@@ -135,7 +135,7 @@ const props = defineProps({
    * @default "en"
    */
   lang: {
-    type: String as PropType<typeof langs[number]>,
+    type: String as PropType<typeof langs[number] | string>,
     default: "en",
     validator: (value: typeof langs[number]) => [
       "ar",
