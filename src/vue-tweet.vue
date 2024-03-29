@@ -9,7 +9,7 @@ import {
   defineComponent,
   ref,
   onMounted,
-  PropType,
+  type PropType,
   nextTick,
   watch,
 } from "vue";
@@ -49,27 +49,26 @@ const langs = [
   "zh-cn",
   "zh-tw",
 ] as const;
-const TWEET_URL_REGEX =
-  /^(https?:\/\/)?(www\.)?twitter\.com\/.*\/status(?:es)?\/(?<tweetId>[^\/\?]\d+)$/i;
+const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?twitter\.com\/.*\/status(?:es)?\/(?<tweetId>[^/?]\d+)$/i;
 
 export default defineComponent({
   props: {
     /**
-     The numerical ID of the desired Tweet.
-     
-     @example
-       <TweetEmbed tweetId="20" />
+    The numerical ID of the desired Tweet.
+    
+    @example
+      <TweetEmbed tweetId="20" />
      */
     tweetId: {
       type: String,
       default: "",
     },
     /**
-     The Tweet URL.
+    The Tweet URL.
 
-     @example
-       <TweetEmbed tweetId="https://twitter.com/jack/status/20" />
-     */
+    @example
+      <TweetEmbed tweetId="https://twitter.com/jack/status/20" />
+    */
     tweetUrl: {
       type: String,
       default: "",
@@ -169,9 +168,13 @@ export default defineComponent({
     });
 
     function renderTweet(): void {
+      console.log(window["twttr"]?.ready)
       if (!(window["twttr"] && window["twttr"].ready)) {
+        console.log("should add it")
         addScript("https://platform.twitter.com/widgets.js", renderTweet);
         return;
+      } else {
+        console.log("already added")
       }
 
       window["twttr"].ready().then(({ widgets }: any) => {
