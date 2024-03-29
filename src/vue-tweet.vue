@@ -292,7 +292,6 @@ function addScript(src: string, cb: () => void): void {
   }
 
   if (window['___$twitterScriptLoading___']) {
-    // If the script is currently being loaded, set up an interval to wait until it's loaded
     const waitInterval = setInterval(() => {
       if (window['___$twitterScriptLoaded___']) {
         clearInterval(waitInterval);
@@ -309,7 +308,6 @@ function addScript(src: string, cb: () => void): void {
   s.addEventListener("load", () => {
     window['___$twitterScriptLoaded___'] = true;
     window['___$twitterScriptLoading___'] = false;
-    // Call the callback once the script is successfully loaded
     cb();
   }, false);
   document.body.appendChild(s);
