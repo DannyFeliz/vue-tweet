@@ -309,7 +309,8 @@ function addScript(src: string, cb: () => void): void {
   s.addEventListener("load", () => {
     window['___$twitterScriptLoaded___'] = true;
     window['___$twitterScriptLoading___'] = false;
-    cb(); // Call the callback once the script is successfully loaded
+    // Call the callback once the script is successfully loaded
+    cb();
   }, false);
   document.body.appendChild(s);
 }
