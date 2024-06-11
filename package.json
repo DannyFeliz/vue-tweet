@@ -27,7 +27,7 @@
     "publish-package": "npm run type-check && npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
     "prepare": "husky install"
   },
-  "dependencies": {
+  "peerDependencies": {
     "vue": "^3.4.27"
   },
   "devDependencies": {
