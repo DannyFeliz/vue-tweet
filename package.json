@@ -1,7 +1,7 @@
 {
   "name": "vue-tweet",
   "description": "Embed tweets just by giving the ID of a Tweet",
-  "version": "2.2.5",
+  "version": "2.2.6",
   "type": "module",
   "files": [
     "dist"
