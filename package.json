@@ -20,11 +20,11 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/vue-tweet.vue --outDir dist",
+    "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/vue-tweet.vue --declarationDir dist",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
-    "publish-package": "npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
+    "publish-package": "npm run type-check && npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
     "prepare": "husky install"
   },
   "dependencies": {

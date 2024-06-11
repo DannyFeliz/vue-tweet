@@ -215,6 +215,9 @@ function renderTweet(): void {
     // Clear previously rendered tweet before rendering the updated tweet id
     if (tweetContainerRef.value) {
       tweetContainerRef.value.innerHTML = "";
+    } else {
+      console.error("tweetContainerRef is null");
+      return;
     }
 
     const { tweetId, tweetOptions } = getTweetParams();
@@ -235,6 +238,10 @@ function renderTweet(): void {
       .finally(() => {
         isLoading.value = false;
       });
+  }).catch((error: Error) => {
+    console.error("Error loading Twitter widget:", error);
+    hasError.value = true;
+    isLoading.value = false;
   });
 }
 
