@@ -66,7 +66,7 @@ const props = defineProps({
   The Tweet URL.
 
   @example
-    <TweetEmbed tweetId="https://twitter.com/jack/status/20" />
+    <TweetEmbed tweetId="https://x.com/jack/status/20" />
   */
   tweetUrl: {
     type: String,
@@ -258,7 +258,7 @@ function getTweetParams() {
       );
     }
   } else if (tweetUrl) {
-    const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?twitter\.com\/.*\/status(?:es)?\/(?<tweetId>[^/?]\d+)$/i;
+    const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?(twitter|x)\.com\/.*\/status(?:es)?\/(?<tweetId>[^/?]\d+)$/i;
 
     const match = tweetUrl.trim().match(TWEET_URL_REGEX);
     if (match) {

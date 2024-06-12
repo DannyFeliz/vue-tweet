@@ -15,7 +15,7 @@ function onTweetLoadError(error: Error) {
 
 <template>
     <vue-tweet
-      tweet-url="https://twitter.com/vuejs/status/1753678159067881809"
+      tweet-url="https://x.com/vuejs/status/1753678159067881809"
       cards="visible"
       conversation="all"
       lang="en"
