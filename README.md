@@ -42,12 +42,12 @@ import Tweet from "vue-tweet";
 
 <template>
   <Tweet
-    tweet-url="https://twitter.com/DannyFeliz08/status/1530240085807054848"
+    tweet-url="https://x.com/DannyFeliz08/status/1530240085807054848"
   />
 </template>
 ```
 
-# Props - [Embedded Tweet parameter reference](https://developer.twitter.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
+# Props - [Embedded Tweet parameter reference](https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
 
 ### Note: You must provide either `tweet-id` or `tweet-url`.
 
