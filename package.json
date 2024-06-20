@@ -11,8 +11,14 @@
   "module": "./dist/vue-tweet.js",
   "exports": {
     ".": {
-      "import": "./dist/vue-tweet.js",
-      "require": "./dist/vue-tweet.umd.cjs"
+      "import": {
+        "types": "./dist/vue-tweet.vue.d.ts",
+        "default": "./dist/vue-tweet.js"
+      },
+      "require": {
+        "types": "./dist/vue-tweet.vue.cts",
+        "default": "./dist/vue-tweet.umd.cjs"
+      }
     }
   },
   "scripts": {
@@ -20,11 +26,12 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/vue-tweet.vue --declarationDir dist",
+    "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/vue-tweet.vue --declarationDir dist && npm run copy-types",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
     "publish-package": "npm run type-check && npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
+    "copy-types": "cp ./dist/vue-tweet.vue.d.ts ./dist/vue-tweet.vue.cts",
     "prepare": "husky install"
   },
   "peerDependencies": {
@@ -45,6 +52,7 @@
     "npm-run-all2": "^6.1.2",
     "typescript": "~5.4.5",
     "vite": "^5.2.13",
+    "vite-plugin-dts": "^3.9.1",
     "vite-plugin-vue-devtools": "^7.0.18",
     "vue-tsc": "^2.0.21"
   },
