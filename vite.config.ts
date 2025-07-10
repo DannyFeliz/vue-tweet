@@ -12,12 +12,13 @@ export default defineConfig({
     vue(),
     VueDevTools(),
     dts({
-      include: ['src/**/*.vue', 'src/**/*.ts'],
+      include: ['src/**/*.vue', 'src/**/*.ts', 'env.d.ts'],
       insertTypesEntry: true,
       staticImport: true,
       rollupTypes: true,
       copyDtsFiles: true,
       exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
+      tsconfigPath: './tsconfig.app.json',
       compilerOptions: {
         strict: false,
         skipLibCheck: true,
@@ -41,6 +42,7 @@ export default defineConfig({
     rollupOptions: {
       external: ['vue'],
       output: {
+        exports: 'named',
         globals: {
           vue: 'Vue',
         },

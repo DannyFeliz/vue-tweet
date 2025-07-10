@@ -20,6 +20,6 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["vite/client", "node"]
+    "types": ["vite/client", "node", "@vue/runtime-core"]
   }
 }

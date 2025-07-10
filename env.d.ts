@@ -6,6 +6,17 @@ declare module '*.vue' {
   export default component
 }
 
+// Add proper Vue global types for template variables
+declare module '@vue/runtime-core' {
+  interface ComponentCustomProperties {
+    $attrs: Record<string, unknown>
+  }
+  
+  interface ComponentInternalInstance {
+    setupState: Record<string, any>
+  }
+}
+
 declare global {
   interface Window {
     twttr?: {
