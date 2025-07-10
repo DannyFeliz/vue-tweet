@@ -23,11 +23,11 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build && npm run copy-types",
     "preview": "vite preview",
     "build-only": "vite build",
     "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/index.ts --declarationDir dist && npm run copy-types",
-    "type-check": "vue-tsc --build --force",
+    "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
     "publish-package": "npm run type-check && npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",

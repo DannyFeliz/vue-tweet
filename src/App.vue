@@ -18,7 +18,7 @@ function onTweetLoadError(error: Error) {
       tweet-url="https://x.com/vuejs/status/1753678159067881809"
       cards="visible"
       conversation="all"
-      lang="en"
+      lang="es"
       theme="light"
       align="left"
       :width="400"

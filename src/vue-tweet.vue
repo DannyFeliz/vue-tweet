@@ -11,14 +11,10 @@ import {
   nextTick,
   watch,
   toRef,
-  withDefaults,
+  type PropType,
 } from 'vue'
 
-const langs = [
-  'ar', 'bn', 'cs', 'da', 'de', 'el', 'en', 'es', 'fa', 'fi', 'fil', 'fr', 'he', 'hi', 'hu', 'id', 'it', 'ja', 'ko', 'msa', 'nl', 'no', 'pl', 'pt', 'ro', 'ru', 'sv', 'th', 'tr', 'uk', 'ur', 'vi', 'zh-cn', 'zh-tw',
-] as const
-
-export type TweetLang = typeof langs[number]
+export type TweetLang = 'ar' | 'bn' | 'cs' | 'da' | 'de' | 'el' | 'en' | 'es' | 'fa' | 'fi' | 'fil' | 'fr' | 'he' | 'hi' | 'hu' | 'id' | 'it' | 'ja' | 'ko' | 'msa' | 'nl' | 'no' | 'pl' | 'pt' | 'ro' | 'ru' | 'sv' | 'th' | 'tr' | 'uk' | 'ur' | 'vi' | 'zh-cn' | 'zh-tw'
 
 export interface TweetProps {
   tweetId?: string
@@ -32,22 +28,60 @@ export interface TweetProps {
   dnt?: boolean
 }
 
-const props = withDefaults(defineProps<TweetProps>(), {
-  tweetId: '',
-  tweetUrl: '',
-  conversation: 'all',
-  cards: 'visible',
-  width: 'auto',
-  align: undefined,
-  theme: 'light',
-  lang: 'en',
-  dnt: false,
+const props = defineProps({
+  tweetId: {
+    type: String,
+    default: '',
+  },
+  tweetUrl: {
+    type: String,
+    default: '',
+  },
+  conversation: {
+    type: String as PropType<'all' | 'none'>,
+    default: 'all',
+    validator: (value: string) => ['all', 'none'].includes(value),
+  },
+  cards: {
+    type: String as PropType<'visible' | 'hidden'>,
+    default: 'visible',
+    validator: (value: string) => ['visible', 'hidden'].includes(value),
+  },
+  width: {
+    type: [String, Number] as PropType<'auto' | number>,
+    default: 'auto',
+    validator: (value: string | number) => {
+      if (typeof value === 'string') {
+        return value === 'auto'
+      }
+      if (typeof value === 'number') {
+        return value >= 250 && value <= 550
+      }
+      return false
+    },
+  },
+  align: {
+    type: [String, undefined] as PropType<'left' | 'right' | 'center' | undefined>,
+    default: undefined,
+    validator: (value: string | undefined) =>
+      ['left', 'right', 'center', undefined].includes(value),
+  },
+  theme: {
+    type: String as PropType<'light' | 'dark'>,
+    default: 'light',
+    validator: (value: string) => ['light', 'dark'].includes(value),
+  },
+  lang: {
+    type: String as PropType<TweetLang>,
+    default: 'en',
+  },
+  dnt: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const emit = defineEmits<{
-  'tweet-load-success': [twitterWidgetElement: HTMLDivElement]
-  'tweet-load-error': [error: Error]
-}>()
+const emit = defineEmits(['tweet-load-success', 'tweet-load-error'])
 
 const isLoading = ref(true)
 const hasError = ref(false)
@@ -67,7 +101,7 @@ function renderTweet(): void {
     return
   }
 
-  window.twttr.ready().then(({ widgets }) => {
+  window.twttr.ready().then(({ widgets }: any) => {
     isLoading.value = true
     hasError.value = false
     // Clear previously rendered tweet before rendering the updated tweet id

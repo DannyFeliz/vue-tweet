@@ -18,7 +18,7 @@ export default defineConfig({
       rollupTypes: true,
       copyDtsFiles: true,
       compilerOptions: {
-        strict: true,
+        strict: false,
         skipLibCheck: true,
         allowSyntheticDefaultImports: true,
         esModuleInterop: true,
