@@ -6,17 +6,17 @@
   "files": [
     "dist"
   ],
-  "types": "./dist/vue-tweet.vue.d.ts",
+  "types": "./dist/index.d.ts",
   "main": "./dist/vue-tweet.umd.cjs",
   "module": "./dist/vue-tweet.js",
   "exports": {
     ".": {
       "import": {
-        "types": "./dist/vue-tweet.vue.d.ts",
+        "types": "./dist/index.d.ts",
         "default": "./dist/vue-tweet.js"
       },
       "require": {
-        "types": "./dist/vue-tweet.vue.cts",
+        "types": "./dist/index.d.cts",
         "default": "./dist/vue-tweet.umd.cjs"
       }
     }
@@ -26,12 +26,12 @@
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "build-only": "vite build",
-    "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/vue-tweet.vue --declarationDir dist && npm run copy-types",
+    "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/index.ts --declarationDir dist && npm run copy-types",
     "type-check": "vue-tsc --build --force",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
     "publish-package": "npm run type-check && npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
-    "copy-types": "cp ./dist/vue-tweet.vue.d.ts ./dist/vue-tweet.vue.cts",
+    "copy-types": "cp ./dist/index.d.ts ./dist/index.d.cts",
     "prepare": "husky install"
   },
   "peerDependencies": {

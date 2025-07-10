@@ -1,5 +1,19 @@
-declare module 'global' {
+declare global {
   interface Window {
-    twttr: any;
+    twttr: {
+      ready(): Promise<{
+        widgets: {
+          createTweet(
+            tweetId: string,
+            container: HTMLElement,
+            options?: Record<string, any>
+          ): Promise<HTMLDivElement | undefined>;
+        };
+      }>;
+    };
+    ___$twitterScriptLoaded___?: boolean;
+    ___$twitterScriptLoading___?: boolean;
   }
 }
+
+export {};
