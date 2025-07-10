@@ -1,6 +1,6 @@
 # vue-tweet
 
-Vue 3 component that lets you embed tweets in your App by only giving the tweet id
+Vue 3 component that lets you embed tweets in your app by only providing the tweet ID.
 
 [<img src="https://img.shields.io/npm/dt/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 [<img src="https://img.shields.io/npm/v/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
@@ -14,223 +14,228 @@ Vue 3 component that lets you embed tweets in your App by only giving the tweet 
 ## Installation
 
 ```bash
-npm install vue-tweet --save
+npm install vue-tweet
 
 # or with yarn
-
 yarn add vue-tweet
+
+# or with pnpm
+pnpm add vue-tweet
 ```
 
 ## Usage
 
-```vue
-<script setup>
-import Tweet from "vue-tweet";
-</script>
-
-<template>
-  <Tweet tweet-id="1530240085807054848" />
-</template>
-```
-
-Or using a tweet URL
+### Basic Usage with Tweet ID
 
 ```vue
 <script setup>
-import Tweet from "vue-tweet";
+import VueTweet from 'vue-tweet'
 </script>
 
 <template>
-  <Tweet
-    tweet-url="https://x.com/DannyFeliz08/status/1530240085807054848"
-  />
+  <VueTweet tweet-id="1530240085807054848" />
 </template>
 ```
 
-# Props - [Embedded Tweet parameter reference](https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference)
+### Using Tweet URL
 
-### Note: You must provide either `tweet-id` or `tweet-url`.
+```vue
+<script setup>
+import VueTweet from 'vue-tweet'
+</script>
 
-**tweet-id**
+<template>
+  <VueTweet tweet-url="https://x.com/DannyFeliz08/status/1530240085807054848" />
+</template>
+```
 
-Type: `string`
+### Using Named Import
 
-Default: `''`
+```vue
+<script setup>
+import { VueTweet } from 'vue-tweet'
+</script>
 
-The numerical ID of the desired Tweet.
+<template>
+  <VueTweet tweet-id="1530240085807054848" />
+</template>
+```
 
-<hr />
+## Props
 
-**tweet-url**
+> **Note:** You must provide either `tweet-id` or `tweet-url`.
 
-Type: `string`
+For detailed information about embedded tweet parameters, see the [Embedded Tweet parameter reference](https://developer.x.com/en/docs/twitter-for-websites/embedded-tweets/guides/embedded-tweet-parameter-reference).
 
-Default: `''`
+### `tweet-id`
 
-The Tweet URL.
+- **Type:** `string`
+- **Default:** `''`
+- **Description:** The numerical ID of the desired tweet.
 
-<hr />
+### `tweet-url`
 
-**cards**
+- **Type:** `string`
+- **Default:** `''`
+- **Description:** The tweet URL.
 
-Type: `string`
+### `cards`
 
-Default: `"visible"`
+- **Type:** `'visible' | 'hidden'`
+- **Default:** `'visible'`
+- **Description:** When set to `'hidden'`, links in a tweet are not expanded to photo, video, or link previews.
 
-Values: `"visible" | "hidden"`
+### `conversation`
 
-When set to hidden, links in a Tweet are not expanded to photo, video, or link previews.
+- **Type:** `'all' | 'none'`
+- **Default:** `'all'`
+- **Description:** When set to `'none'`, only the cited tweet will be displayed even if it is in reply to another tweet.
 
-<hr />
+### `theme`
 
-**conversation**
+- **Type:** `'light' | 'dark'`
+- **Default:** `'light'`
+- **Description:** When set to `'dark'`, displays tweet with light text over a dark background.
 
-Type: `string`
+### `width`
 
-Default: `"all"`
+- **Type:** `'auto' | number`
+- **Default:** `'auto'`
+- **Description:** The maximum width of the rendered tweet in whole pixels. This value should be between `250` and `550` pixels.
 
-Values: `"all" | "none"`
+### `align`
 
-When set to none, only the cited Tweet will be displayed even if it is in reply to another Tweet.
+- **Type:** `'left' | 'right' | 'center' | undefined`
+- **Default:** `undefined`
+- **Description:** Float the tweet left, right, or center relative to its container. Typically set to allow text or other content to wrap around the tweet.
 
-<hr />
+### `lang`
 
-**theme**
+- **Type:** `TweetLang`
+- **Default:** `'en'`
+- **Values:** `'ar' | 'bn' | 'cs' | 'da' | 'de' | 'el' | 'en' | 'es' | 'fa' | 'fi' | 'fil' | 'fr' | 'he' | 'hi' | 'hu' | 'id' | 'it' | 'ja' | 'ko' | 'msa' | 'nl' | 'no' | 'pl' | 'pt' | 'ro' | 'ru' | 'sv' | 'th' | 'tr' | 'uk' | 'ur' | 'vi' | 'zh-cn' | 'zh-tw'`
+- **Description:** A supported Twitter language code. Loads text components in the specified language. Note: does not affect the text of the cited tweet.
 
-Type: `string`
+### `dnt`
 
-Default: `"light"`
+- **Type:** `boolean`
+- **Default:** `false`
+- **Description:** When set to `true`, the tweet and its embedded page on your site are not used for purposes that include personalized suggestions and personalized ads.
 
-Values: `"light" | "dark"`
+## Events
 
-When set to dark, displays Tweet with light text over a dark background.
+### `tweet-load-success`
 
-<hr />
+- **Type:** `(embedHtmlNode: HTMLElement) => void`
+- **Description:** Emitted after successfully loading the tweet.
 
-**width**
+### `tweet-load-error`
 
-Type: `string | number`
+- **Type:** `(error: Error) => void`
+- **Description:** Emitted when an error occurs while trying to load the tweet.
 
-Default: `"auto"`
+## Slots
 
-Values: `"auto" | number`
-
-The maximum width of the rendered Tweet in whole pixels. This value should be between `250` and `550` pixels.
-
-<hr />
-
-**align**
-
-Type: `string | undefined`
-
-Default: `undefined`
-
-Values: `"left" | "right" | "center" | undefined`
-
-Float the Tweet left, right, or center relative to its container. Typically set to allow text or other content to wrap around the Tweet.
-
-<hr />
-
-**lang**
-
-Type: `string`
-
-Default: `en`
-
-Values: `"ar" | "bn" | "cs" | "da" | "de" | "el" | "en" | "es" | "fa" | "fi" | "fil" | "fr" | "he" | "hi" | "hu" | "id" | "it" | "ja" | "ko" | "msa" | "nl" | "no" | "pl" | "pt" | "ro" | "ru" | "sv" | "th" | "tr" | "uk" | "ur" | "vi" | "zh-cn" | "zh-tw"`
-
-A supported Twitter language code. Loads text components in the specified language. Note: does not affect the text of the cited Tweet.
-
-<hr />
-
-**dnt**
-
-Type: `boolean`
-
-Default: `false`
-
-When set to true, the Tweet and its embedded page on your site are not used for purposes that include personalized suggestions and personalized ads.
-
-# Events
-
-**tweet-load-success**
-
-Type: `HTMLElement`
-
-Attributes: `(embedHtmlNode)`
-
-Emitted after successfully load the tweet.
-
-<hr />
-
-**tweet-load-error**
-
-Emitted after an error occurs while trying to get the tweet
-
-# Slots
-
-**loading**
+### `loading`
 
 Slot for custom loading state.
 
 ```vue
-<Tweet tweetId="20">
-    <template v-slot:loading>
-      <span>Loading...</span>
-    </template>
-</Tweet>
+<VueTweet tweet-id="20">
+  <template #loading>
+    <span>Loading tweet...</span>
+  </template>
+</VueTweet>
 ```
 
-<hr />
-
-**error**
+### `error`
 
 Slot for custom error state.
 
 ```vue
-<Tweet tweetId="20">
-    <template v-slot:error>
-      <span>Sorry, that tweet doesn't exist!</span>
+<VueTweet tweet-id="20">
+  <template #error>
+    <span>Sorry, that tweet doesn't exist!</span>
+  </template>
+</VueTweet>
+```
+
+## Complete Example
+
+```vue
+<script setup>
+import VueTweet from 'vue-tweet'
+
+function onTweetLoaded(embedHtmlNode) {
+  console.log('Tweet loaded successfully:', embedHtmlNode)
+}
+
+function onTweetError(error) {
+  console.error('Failed to load tweet:', error)
+}
+</script>
+
+<template>
+  <VueTweet
+    tweet-id="1530240085807054848"
+    theme="dark"
+    cards="hidden"
+    conversation="none"
+    :width="400"
+    align="center"
+    lang="en"
+    :dnt="true"
+    @tweet-load-success="onTweetLoaded"
+    @tweet-load-error="onTweetError"
+  >
+    <template #loading>
+      <div class="loading-spinner">Loading tweet...</div>
     </template>
-</Tweet>
+    <template #error>
+      <div class="error-message">Failed to load tweet</div>
+    </template>
+  </VueTweet>
+</template>
 ```
 
-## Development setup
+## Development Setup
 
-```
+```bash
+# Install dependencies
 npm install
-```
 
-### Compiles and hot-reloads for development
-
-```
+# Start development server
 npm run dev
-```
 
-### Compiles and minifies for production
-
-```
+# Build for production
 npm run build
+
+# Preview production build
+npm run preview
+
+# Type checking
+npm run type-check
+
+# Lint files
+npm run lint
 ```
 
-### Locally preview production build
+## TypeScript Support
 
+This package includes TypeScript definitions. You can import the component and types:
+
+```typescript
+import VueTweet, { type TweetProps, type TweetLang } from 'vue-tweet'
 ```
-npm run serve
-```
 
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Vetur](https://marketplace.visualstudio.com/items?itemName=octref.vetur). Make sure to enable `vetur.experimental.templateInterpolationService` in settings!
-
-### Customize configuration
-
-See [Configuration Reference](https://vitejs.dev/guide/#command-line-interface).
-
-# Contributing
+## Contributing
 
 1. Fork it (<https://github.com/dannyfeliz/vue-tweet/fork>)
-2. Create your feature branch (`git checkout -b feature/fooBar`)
-3. Commit your changes (`git commit -am "Add some fooBar"`)
-4. Push to the branch (`git push origin feature/fooBar`)
+2. Create your feature branch (`git checkout -b feature/awesome-feature`)
+3. Commit your changes (`git commit -am 'Add some awesome feature'`)
+4. Push to the branch (`git push origin feature/awesome-feature`)
 5. Create a new Pull Request
+
+## License
+
+MIT
