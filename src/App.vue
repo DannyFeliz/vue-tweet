@@ -18,7 +18,7 @@ function onTweetLoadError(error: Error) {
       tweet-url="https://x.com/vuejs/status/1753678159067881809"
       cards="visible"
       conversation="all"
-      lang="es"
+      lang="en"
       theme="light"
       align="left"
       :width="400"
@@ -26,11 +26,11 @@ function onTweetLoadError(error: Error) {
       @tweet-load-error="onTweetLoadError"
       @tweet-load-success="onTweetLoadSuccess"
     >
-      <template v-slot:loading>
+      <template #loading>
         <span>Loading...</span>
       </template>
 
-      <template v-slot:error>
+      <template #error>
         <span>{{ tweetError?.message }}</span>
       </template>
     </vue-tweet>

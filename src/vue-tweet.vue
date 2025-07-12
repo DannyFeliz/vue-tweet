@@ -96,12 +96,12 @@ watch(toRef(props), renderTweet, {
 })
 
 function renderTweet(): void {
-  if (!((window as any).twttr && (window as any).twttr.ready)) {
+  if (!(window.twttr && window.twttr.ready)) {
     addScript('https://platform.twitter.com/widgets.js', renderTweet)
     return
   }
 
-  (window as any).twttr.ready().then(({ widgets }: any) => {
+  window.twttr.ready().then(({ widgets }) => {
     isLoading.value = true
     hasError.value = false
     // Clear previously rendered tweet before rendering the updated tweet id
@@ -113,7 +113,6 @@ function renderTweet(): void {
     }
 
     const { tweetId, tweetOptions } = getTweetParams()
-
     widgets
       .createTweet(tweetId, tweetContainerRef.value, tweetOptions)
       .then(async (twitterWidgetElement: HTMLDivElement | undefined) => {
@@ -133,6 +132,7 @@ function renderTweet(): void {
   }).catch((error: Error) => {
     console.error('Error loading Twitter widget:', error)
     hasError.value = true
+  }).finally(() => {
     isLoading.value = false
   })
 }
@@ -176,22 +176,22 @@ function getTweetParams() {
 }
 
 function addScript(src: string, cb: () => void): void {
-  if ((window as any).___$twitterScriptLoaded___ === undefined) {
-    (window as any).___$twitterScriptLoaded___ = false
+  if (window.___$twitterScriptLoaded___ === undefined) {
+    window.___$twitterScriptLoaded___ = false
   }
 
-  if ((window as any).___$twitterScriptLoaded___) {
-    cb()
-    return
+  if (window.___$twitterScriptLoaded___) {
+    cb();
+    return;
   }
 
-  if ((window as any).___$twitterScriptLoading___ === undefined) {
-    (window as any).___$twitterScriptLoading___ = false
+  if (window.___$twitterScriptLoading___ === undefined) {
+    window.___$twitterScriptLoading___ = false
   }
 
-  if ((window as any).___$twitterScriptLoading___) {
+  if (window.___$twitterScriptLoading___) {
     const waitInterval = setInterval(() => {
-      if ((window as any).___$twitterScriptLoaded___) {
+      if (window.___$twitterScriptLoaded___) {
         clearInterval(waitInterval)
         cb()
       }
@@ -199,13 +199,13 @@ function addScript(src: string, cb: () => void): void {
     return
   }
 
-  (window as any).___$twitterScriptLoading___ = true
+  window.___$twitterScriptLoading___ = true
   const s = document.createElement('script')
   s.setAttribute('src', src)
   s.async = true
   s.addEventListener('load', () => {
-    (window as any).___$twitterScriptLoaded___ = true
-    ;(window as any).___$twitterScriptLoading___ = false
+    window.___$twitterScriptLoaded___ = true
+    window.___$twitterScriptLoading___ = false
     cb()
   }, false)
   document.body.appendChild(s)
