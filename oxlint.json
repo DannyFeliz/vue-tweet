@@ -1,0 +1,7 @@
+{
+  "plugins": ["vue", "typescript", "import"],
+  "rules": {
+    "typescript/no-explicit-any": "warn",
+    "vue/multi-word-component-names": "off"
+  }
+} 
