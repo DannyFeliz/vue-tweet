@@ -5,6 +5,7 @@
 </template>
 
 <script lang="ts" setup>
+import "../env.d.ts"
 import {
   ref,
   onMounted,
@@ -150,11 +151,11 @@ function getTweetParams() {
       )
     }
   } else if (tweetUrl) {
-    const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?(twitter|x)\.com\/.*\/status(?:es)?\/(?<tweetId>[^/?]\d+)$/i
+    const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?(twitter|x)\.com\/.*\/status(?:es)?\/([^/?]\d+)$/i
 
     const match = tweetUrl.trim().match(TWEET_URL_REGEX)
-    if (match && match.groups?.tweetId) {
-      tweetId = match.groups.tweetId
+    if (match && match[4]) {
+      tweetId = match[4]
     } else {
       error = new Error('Invalid tweet-url.')
     }
