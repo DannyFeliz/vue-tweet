@@ -97,11 +97,29 @@ watch(toRef(props), renderTweet, {
 })
 
 function renderTweet(): void {
-  if (!(window.twttr && window.twttr.ready)) {
-    addScript('https://platform.twitter.com/widgets.js', renderTweet)
+  // If script is not loaded and not currently loading, load it
+  if (!(window.twttr && window.twttr.ready) && !window.___$twitterScriptLoaded___ && !window.___$twitterScriptLoading___) {
+    addScript('https://platform.twitter.com/widgets.js', renderTweet);
     return
   }
 
+  // If script is loaded or available, proceed with rendering
+  if (window.twttr && window.twttr.ready) {
+    renderTweetContent()
+  } else {
+    // If script is loading, wait for it to be ready
+    const waitForScript = () => {
+      if (window.twttr && window.twttr.ready) {
+        renderTweetContent()
+      } else {
+        setTimeout(waitForScript, 150)
+      }
+    }
+    waitForScript()
+  }
+}
+
+function renderTweetContent(): void {
   window.twttr.ready().then(({ widgets }) => {
     isLoading.value = true
     hasError.value = false
@@ -180,16 +198,17 @@ function addScript(src: string, cb: () => void): void {
   if (window.___$twitterScriptLoaded___ === undefined) {
     window.___$twitterScriptLoaded___ = false
   }
+  if (window.___$twitterScriptLoading___ === undefined) {
+    window.___$twitterScriptLoading___ = false
+  }
 
+  // If script is already loaded, execute callback immediately
   if (window.___$twitterScriptLoaded___) {
     cb();
     return;
   }
 
-  if (window.___$twitterScriptLoading___ === undefined) {
-    window.___$twitterScriptLoading___ = false
-  }
-
+  // If script is currently loading, wait for it to complete
   if (window.___$twitterScriptLoading___) {
     const waitInterval = setInterval(() => {
       if (window.___$twitterScriptLoaded___) {
@@ -200,7 +219,9 @@ function addScript(src: string, cb: () => void): void {
     return
   }
 
+  // Set loading state immediately to prevent race conditions
   window.___$twitterScriptLoading___ = true
+  
   const s = document.createElement('script')
   s.setAttribute('src', src)
   s.async = true
@@ -209,6 +230,13 @@ function addScript(src: string, cb: () => void): void {
     window.___$twitterScriptLoading___ = false
     cb()
   }, false)
+  
+  // Handle script load errors
+  s.addEventListener('error', () => {
+    console.error('Failed to load Twitter script')
+    window.___$twitterScriptLoading___ = false
+  }, false)
+  
   document.body.appendChild(s)
 }
 </script>
