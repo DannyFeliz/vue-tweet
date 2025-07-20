@@ -28,31 +28,25 @@ jobs:
         path: |
           ~/.cache/ms-playwright
         key: ${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}
-    - name: Create system deps marker
-      id: system-deps-marker
-      run: |
-        echo "DEPS_KEY=${{ runner.os }}-system-deps-${{ steps.playwright-version.outputs.PLAYWRIGHT_VERSION }}" >> $GITHUB_OUTPUT
-        mkdir -p ~/.playwright-system-deps
-    - name: Cache system dependencies marker
+    - name: Cache system dependencies
       uses: actions/cache@v4
       id: system-deps-cache
       with:
-        path: ~/.playwright-system-deps
-        key: ${{ steps.system-deps-marker.outputs.DEPS_KEY }}
-    - name: Install Playwright Browsers with system deps (no cache)
-      run: |
-        npx playwright install --with-deps
-        touch ~/.playwright-system-deps/installed
+        path: |
+          /var/cache/apt
+          /var/lib/apt/lists
+        key: ${{ runner.os }}-system-deps-${{ hashFiles('.github/workflows/playwright.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-system-deps-
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
       if: steps.playwright-cache.outputs.cache-hit != 'true'
-    - name: Install Playwright Browsers only (browsers cached, need system deps)
-      run: |
-        npx playwright install
-        npx playwright install-deps
-        touch ~/.playwright-system-deps/installed
-      if: steps.playwright-cache.outputs.cache-hit == 'true' && steps.system-deps-cache.outputs.cache-hit != 'true'
-    - name: Install Playwright Browsers only (both cached)
+    - name: Install Playwright Browsers (cache hit)
       run: npx playwright install
       if: steps.playwright-cache.outputs.cache-hit == 'true' && steps.system-deps-cache.outputs.cache-hit == 'true'
+    - name: Install Playwright system dependencies
+      run: npx playwright install-deps
+      if: steps.playwright-cache.outputs.cache-hit == 'true' && steps.system-deps-cache.outputs.cache-hit != 'true'
   
     - name: Run Playwright tests
       run: npx playwright test
