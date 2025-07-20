@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5174/');
+    await page.goto('http://localhost:5173/');
   });
 
   test('should verify theme variations by examining iframe content styles', async ({ page }) => {
-    await page.goto('http://localhost:5174/#themes');
+    await page.goto('http://localhost:5173/#themes');
     
     // Wait for tweets to load
     await page.waitForSelector('iframe', { timeout: 15000 });
@@ -42,7 +42,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
     test('should verify alignment variations by checking twitter-tweet element float styles', async ({ page }) => {
-    await page.goto('http://localhost:5174/#alignment');
+    await page.goto('http://localhost:5173/#alignment');
     await page.waitForSelector('iframe', { timeout: 15000 });
     
     const alignmentTests = [
@@ -72,7 +72,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify width variations by checking iframe dimensions', async ({ page }) => {
-    await page.goto('http://localhost:5174/#width');
+    await page.goto('http://localhost:5173/#width');
     
     // Wait for tweets to load
     await page.waitForSelector('iframe', { timeout: 15000 });
@@ -111,7 +111,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify cards variations by checking image rendering vs links', async ({ page }) => {
-    await page.goto('http://localhost:5174/#cards');
+    await page.goto('http://localhost:5173/#cards');
     await page.waitForSelector('iframe', { timeout: 15000 });
     
     // First tweet (Cards Visible) - should render the actual image
@@ -144,7 +144,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify conversation variations by checking thread visibility', async ({ page }) => {
-    await page.goto('http://localhost:5174/#conversation');
+    await page.goto('http://localhost:5173/#conversation');
     
     // Wait for tweets to load
     await page.waitForSelector('iframe', { timeout: 15000 });
@@ -171,7 +171,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify language variations by checking tweet language attributes', async ({ page }) => {
-    await page.goto('http://localhost:5174/#languages');
+    await page.goto('http://localhost:5173/#languages');
     
     // Wait for tweets to load
     await page.waitForSelector('iframe', { timeout: 15000 });
@@ -198,7 +198,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify tweetId variations load correct tweets', async ({ page }) => {
-    await page.goto('http://localhost:5174/#tweetId');
+    await page.goto('http://localhost:5173/#tweetId');
     
     // Wait for tweet iframes to load (not just any iframe)
     await page.waitForSelector('iframe[src*="platform.twitter.com/embed/Tweet.html"]', { timeout: 15000 });
@@ -226,7 +226,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify slot variations show custom content', async ({ page }) => {
-    await page.goto('http://localhost:5174/#slots');
+    await page.goto('http://localhost:5173/#slots');
     
     // Check custom loading slot or loaded tweet
     const customLoadingSlot = page.locator('.custom-loading');
@@ -250,7 +250,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify callback variations trigger properly', async ({ page }) => {
-    await page.goto('http://localhost:5174/#callbacks');
+    await page.goto('http://localhost:5173/#callbacks');
     
     // Monitor console for callback logs
     const consoleMessages: string[] = [];
@@ -285,7 +285,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify combined variations work together', async ({ page }) => {
-    await page.goto('http://localhost:5174/#combined');
+    await page.goto('http://localhost:5173/#combined');
     
     // Wait for tweet iframes to load
     await page.waitForSelector('iframe[src*="platform.twitter.com/embed/Tweet.html"]', { timeout: 15000 });
@@ -378,7 +378,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
   });
 
   test('should verify tweet content structure is correct', async ({ page }) => {
-    await page.goto('http://localhost:5174/#themes');
+    await page.goto('http://localhost:5173/#themes');
     
     // Wait for tweets to load
     await page.waitForSelector('iframe', { timeout: 15000 });
@@ -413,7 +413,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
 
   test('should verify props are correctly passed to iframe URLs', async ({ page }) => {
     // Test a few key variations to ensure props are correctly passed
-    await page.goto('http://localhost:5174/#themes');
+    await page.goto('http://localhost:5173/#themes');
     await page.waitForSelector('iframe', { timeout: 15000 });
     
     // Light theme
@@ -427,7 +427,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
     expect(darkSrc).toContain('theme=dark');
     
     // Check width variations
-    await page.goto('http://localhost:5174/#width');
+    await page.goto('http://localhost:5173/#width');
     await page.waitForSelector('iframe', { timeout: 15000 });
     
     const widthIframe = page.locator('iframe').nth(1); // 250px width
@@ -435,7 +435,7 @@ test.describe('Vue Tweet Component - Iframe Content Verification', () => {
     expect(widthSrc).toContain('width=250');
     
     // Check language variations
-    await page.goto('http://localhost:5174/#languages');
+    await page.goto('http://localhost:5173/#languages');
     await page.waitForSelector('iframe', { timeout: 15000 });
     
     const spanishIframe = page.locator('iframe').nth(1);
