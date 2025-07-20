@@ -71,10 +71,20 @@ export default defineConfig({
   ],
 
   /* Run your local dev server before starting the tests */
-  webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5174',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000, // 2 minutes
-  },
+ // Start the web servers before running the tests.
+  // For full control, explicitly start a server in a different terminal;
+  // reuseExistingServer will check for the running server.
+  webServer: [
+    // Vue (Vite) server.
+    {
+      command: 'npm run dev',
+      port: 5173,
+      // Re-use the existing server if it's already running
+      reuseExistingServer: process.env.CI !== 'true',
+      // Set stderr and stdout to 'pipe' to see the output in the terminal
+      // @see https://playwright.dev/docs/api/class-testconfig#test-config-web-server
+      stderr: 'pipe', // default 'pipe'
+      stdout: 'ignore', // default 'ignore'
+    },
+  ],
 });
