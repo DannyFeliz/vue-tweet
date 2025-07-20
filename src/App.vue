@@ -2,7 +2,6 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import VueTweet, { type TweetProps } from './vue-tweet.vue'
 
-// Define test configuration interface
 interface TestConfig {
   name: string
   props: Partial<TweetProps>
