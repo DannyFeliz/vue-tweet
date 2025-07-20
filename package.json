@@ -31,12 +31,14 @@
     "lint": "oxlint",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
     "publish-package": "npm run type-check && npm run lint && npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
-    "copy-types": "cp ./dist/index.d.ts ./dist/index.d.cts"
+    "copy-types": "cp ./dist/index.d.ts ./dist/index.d.cts",
+    "test": "playwright test"
   },
   "peerDependencies": {
     "vue": "^3.5.17"
   },
   "devDependencies": {
+    "@playwright/test": "^1.54.1",
     "@tsconfig/node20": "^20.1.2",
     "@types/node": "^20.19.7",
     "@vitejs/plugin-vue": "^6.0.0",
