@@ -93,9 +93,12 @@ For detailed information about embedded tweet parameters, see the [Embedded Twee
 
 ### `theme`
 
-- **Type:** `'light' | 'dark'`
+- **Type:** `'light' | 'dark' | 'system'`
 - **Default:** `'light'`
-- **Description:** When set to `'dark'`, displays tweet with light text over a dark background.
+- **Description:** When set to `'dark'`, displays tweet with light text over a dark background. When set to `'system'`, automatically matches the user's operating system color scheme and updates the tweet when the preference changes.
+
+> [!NOTE]
+> The `'system'` value is a custom implementation provided by this library. It is not part of the official Twitter widget API. Under the hood, it uses `prefers-color-scheme` to detect the OS theme and passes the resolved `'dark'` or `'light'` value to the widget.
 
 ### `width`
 

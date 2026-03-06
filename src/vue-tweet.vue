@@ -7,6 +7,7 @@
 <script lang="ts" setup>
 import {
   ref,
+  computed,
   onMounted,
   onUnmounted,
   nextTick,
@@ -16,6 +17,8 @@ import {
 } from 'vue'
 
 export type TweetLang = 'ar' | 'bn' | 'cs' | 'da' | 'de' | 'el' | 'en' | 'es' | 'fa' | 'fi' | 'fil' | 'fr' | 'he' | 'hi' | 'hu' | 'id' | 'it' | 'ja' | 'ko' | 'msa' | 'nl' | 'no' | 'pl' | 'pt' | 'ro' | 'ru' | 'sv' | 'th' | 'tr' | 'uk' | 'ur' | 'vi' | 'zh-cn' | 'zh-tw'
+export type TweetWidgetTheme = 'light' | 'dark'
+export type TweetTheme = TweetWidgetTheme | 'system'
 
 export interface TweetProps {
   tweetId?: string
@@ -24,7 +27,7 @@ export interface TweetProps {
   cards?: 'visible' | 'hidden'
   width?: 'auto' | number
   align?: 'left' | 'right' | 'center'
-  theme?: 'light' | 'dark'
+  theme?: TweetTheme
   lang?: TweetLang
   dnt?: boolean
 }
@@ -68,9 +71,9 @@ const props = defineProps({
       ['left', 'right', 'center', undefined].includes(value),
   },
   theme: {
-    type: String as PropType<'light' | 'dark'>,
+    type: String as PropType<TweetTheme>,
     default: 'light',
-    validator: (value: string) => ['light', 'dark'].includes(value),
+    validator: (value: string) => ['light', 'dark', 'system'].includes(value),
   },
   lang: {
     type: String as PropType<TweetLang>,
@@ -89,17 +92,61 @@ const hasError = ref(false)
 const tweetContainerRef = ref<HTMLDivElement>()
 const activeTimers: ReturnType<typeof setTimeout | typeof setInterval>[] = []
 
+const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+function getSystemTheme(): TweetWidgetTheme {
+  return darkModeMediaQuery.matches ? 'dark' : 'light'
+}
+
+// Tracks the last known system theme so we can detect actual changes
+const lastSystemTheme = ref<TweetWidgetTheme>(getSystemTheme())
+
+const resolvedTheme = computed<TweetWidgetTheme>(() =>
+  props.theme === 'system' ? lastSystemTheme.value : props.theme
+)
+
+function onSystemThemeChange(event: MediaQueryListEvent): void {
+  const newTheme: TweetWidgetTheme = event.matches ? 'dark' : 'light'
+  if (newTheme !== lastSystemTheme.value) {
+    lastSystemTheme.value = newTheme
+    // Re-render the tweet with the updated OS theme
+    renderTweet()
+  }
+}
+
+function startListeningToSystemTheme(): void {
+  darkModeMediaQuery.addEventListener('change', onSystemThemeChange)
+}
+
+function stopListeningToSystemTheme(): void {
+  darkModeMediaQuery.removeEventListener('change', onSystemThemeChange)
+}
+
 onMounted(() => {
+  if (props.theme === 'system') {
+    startListeningToSystemTheme()
+  }
   renderTweet()
 })
 
 onUnmounted(() => {
+  stopListeningToSystemTheme()
   activeTimers.forEach(clearTimeout)
   activeTimers.length = 0
 })
 
+// Re-render when any prop changes
 watch(toRef(props), renderTweet, {
   deep: true,
+})
+
+// Manage the matchMedia listener when theme prop toggles to/from 'system'
+watch(() => props.theme, (newTheme, oldTheme) => {
+  if (newTheme === 'system' && oldTheme !== 'system') {
+    startListeningToSystemTheme()
+  } else if (newTheme !== 'system' && oldTheme === 'system') {
+    stopListeningToSystemTheme()
+  }
 })
 
 function renderTweet(): void {
@@ -164,7 +211,12 @@ function renderTweetContent(): void {
 }
 
 function getTweetParams() {
-  let { tweetId, tweetUrl, ...tweetOptions } = props
+  const { tweetId: rawTweetId, tweetUrl: rawTweetUrl, ...tweetOptions } = props
+  let tweetId = rawTweetId
+  let tweetUrl = rawTweetUrl
+
+  // Always pass the resolved theme ('dark' | 'light') to the Twitter widget, never 'system'
+  tweetOptions.theme = resolvedTheme.value
 
   let error: Error | null = null
   if (tweetId && tweetUrl) {

@@ -49,6 +49,7 @@ const variations = computed((): Record<string, VariationConfig> => {
       tests: [
         { name: 'Light Theme', props: { theme: 'light' } },
         { name: 'Dark Theme', props: { theme: 'dark' } },
+        { name: 'System Theme', props: { theme: 'system' } },
       ]
     },
     alignment: {
