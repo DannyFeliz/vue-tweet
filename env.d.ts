@@ -5,11 +5,11 @@ declare module '*.vue' {
   export default component
 }
 
-declare module '@vue/runtime-core' {
+declare module 'vue' {
   interface ComponentCustomProperties {
     $attrs: Record<string, unknown>
   }
-  
+
   interface ComponentInternalInstance {
     setupState: Record<string, any>
   }
