@@ -1,17 +1,12 @@
 /// <reference types="vite/client" />
 
-declare module '*.vue' {
-  const component: Record<string, unknown>
-  export default component
-}
-
 declare module 'vue' {
   interface ComponentCustomProperties {
     $attrs: Record<string, unknown>
   }
 
   interface ComponentInternalInstance {
-    setupState: Record<string, any>
+    setupState: Record<string, unknown>
   }
 }
 
@@ -23,7 +18,7 @@ declare global {
           createTweet(
             tweetId: string,
             container: HTMLElement,
-            options?: Record<string, any>
+            options?: Record<string, unknown>
           ): Promise<HTMLDivElement | undefined>;
         };
       }>;
