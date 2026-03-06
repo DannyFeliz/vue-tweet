@@ -5,10 +5,10 @@
 </template>
 
 <script lang="ts" setup>
-import "../env.d.ts"
 import {
   ref,
   onMounted,
+  onUnmounted,
   nextTick,
   watch,
   toRef,
@@ -87,9 +87,15 @@ const emit = defineEmits(['tweet-load-success', 'tweet-load-error'])
 const isLoading = ref(true)
 const hasError = ref(false)
 const tweetContainerRef = ref<HTMLDivElement>()
+const activeTimers: ReturnType<typeof setTimeout | typeof setInterval>[] = []
 
 onMounted(() => {
   renderTweet()
+})
+
+onUnmounted(() => {
+  activeTimers.forEach(clearTimeout)
+  activeTimers.length = 0
 })
 
 watch(toRef(props), renderTweet, {
@@ -98,21 +104,21 @@ watch(toRef(props), renderTweet, {
 
 function renderTweet(): void {
   // If script is not loaded and not currently loading, load it
-  if (!(window.twttr && window.twttr.ready) && !window.___$twitterScriptLoaded___ && !window.___$twitterScriptLoading___) {
+  if (!window.twttr && !window.___$twitterScriptLoaded___ && !window.___$twitterScriptLoading___) {
     addScript('https://platform.twitter.com/widgets.js', renderTweet);
     return
   }
 
   // If script is loaded or available, proceed with rendering
-  if (window.twttr && window.twttr.ready) {
+  if (window.twttr) {
     renderTweetContent()
   } else {
     // If script is loading, wait for it to be ready
     const waitForScript = () => {
-      if (window.twttr && window.twttr.ready) {
+      if (window.twttr) {
         renderTweetContent()
       } else {
-        setTimeout(waitForScript, 150)
+        activeTimers.push(setTimeout(waitForScript, 150))
       }
     }
     waitForScript()
@@ -120,7 +126,8 @@ function renderTweet(): void {
 }
 
 function renderTweetContent(): void {
-  window.twttr.ready().then(({ widgets }) => {
+  // Only called after verifying window.twttr exists in renderTweet()
+  window.twttr?.ready().then(({ widgets }) => {
     isLoading.value = true
     hasError.value = false
     // Clear previously rendered tweet before rendering the updated tweet id
@@ -216,6 +223,7 @@ function addScript(src: string, cb: () => void): void {
         cb()
       }
     }, 100)
+    activeTimers.push(waitInterval)
     return
   }
 
