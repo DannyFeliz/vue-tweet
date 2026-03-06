@@ -26,7 +26,7 @@
     "build": "vite build && npm run copy-types",
     "preview": "vite preview",
     "build-only": "vite build",
-    "generate-types": "vue-tsc --declaration --emitDeclarationOnly src/index.ts --declarationDir dist && npm run copy-types",
+    "generate-types": "vue-tsc -p tsconfig.app.json --declaration --emitDeclarationOnly --declarationDir dist && npm run copy-types",
     "type-check": "vue-tsc --build --noEmit",
     "lint": "oxlint",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
