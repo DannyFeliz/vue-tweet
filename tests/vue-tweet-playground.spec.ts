@@ -1,425 +1,311 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type Locator } from '@playwright/test';
 
-test.describe('Vue Tweet Playground - Navigation & Variations', () => {
+/**
+ * Hybrid strategy:
+ * - Deterministic tests block all Twitter/X hosts so they never depend on live
+ *   network: playground navigation, prop wiring, URL/ID validation, loading
+ *   slot, and script-failure handling.
+ * - A small set of live smoke tests verifies real embeds still work and that
+ *   props (theme, conversation, lang, dnt) actually reach the Twitter widget
+ *   via its iframe URL.
+ */
+
+const LIVE_TIMEOUT = 20000;
+
+async function blockTwitterNetwork(page: Page) {
+  for (const pattern of ['**://*.twitter.com/**', '**://*.x.com/**', '**://*.twimg.com/**']) {
+    await page.route(pattern, (route) => route.abort());
+  }
+}
+
+function card(page: Page, name: string): Locator {
+  return page.locator(`.test-item:has(h3:text-is("${name}"))`);
+}
+
+/**
+ * Average RGB channel of the rendered tweet's background, to assert the theme
+ * visually took effect without depending on Twitter's exact palette.
+ */
+async function articleLuminance(item: Locator): Promise<number> {
+  const bg = await item.frameLocator('iframe').locator('article').first().evaluate(
+    (el) => getComputedStyle(el).backgroundColor
+  );
+  const [r, g, b] = (bg.match(/\d+/g) ?? []).map(Number);
+  return (r + g + b) / 3;
+}
+
+test.describe('Playground navigation (no network)', () => {
   test.beforeEach(async ({ page }) => {
+    await blockTwitterNetwork(page);
     await page.goto('/');
   });
 
-  test('should display playground header and navigation', async ({ page }) => {
-    // Check page title and header
+  test('displays the header and all navigation items', async ({ page }) => {
     await expect(page.locator('h1')).toHaveText('Vue Tweet Component Playground');
     await expect(page.locator('header p')).toHaveText('Select a variation to test different props and features');
-    
-    // Check all navigation items are present
+
     const navItems = [
-      'Themes', 'Alignment', 'Width', 'Cards', 'Conversation', 
-      'Languages', 'TweetId', 'Slots', 'Callbacks', 'Combined'
+      'Themes', 'Alignment', 'Width', 'Cards', 'Conversation',
+      'Languages', 'Dnt', 'TweetId', 'Slots', 'Callbacks', 'Errors', 'Combined'
     ];
-    
+
     for (const item of navItems) {
       await expect(page.locator(`nav a:has-text("${item}")`)).toBeVisible();
     }
   });
 
-  test('should navigate to themes variation by default', async ({ page }) => {
-    // Check themes variation content is shown by default
+  test('shows the themes variation by default', async ({ page }) => {
     await expect(page.locator('h2')).toHaveText('Theme Variations');
     await expect(page.locator('main p')).toContainText('Test light and dark themes');
   });
 
-  test('should navigate between all variations and update URL hash', async ({ page }) => {
+  test('navigates between all variations and updates the URL hash', async ({ page }) => {
     const variations = [
       { name: 'Alignment', hash: '#alignment', title: 'Alignment Variations' },
       { name: 'Width', hash: '#width', title: 'Width Variations' },
       { name: 'Cards', hash: '#cards', title: 'Cards Variations' },
       { name: 'Conversation', hash: '#conversation', title: 'Conversation Variations' },
       { name: 'Languages', hash: '#languages', title: 'Language Variations' },
+      { name: 'Dnt', hash: '#dnt', title: 'DNT Variations' },
       { name: 'TweetId', hash: '#tweetId', title: 'Tweet ID Variations' },
       { name: 'Slots', hash: '#slots', title: 'Slot Variations' },
       { name: 'Callbacks', hash: '#callbacks', title: 'Callback Variations' },
+      { name: 'Errors', hash: '#errors', title: 'Error Handling' },
       { name: 'Combined', hash: '#combined', title: 'Combined Variations' },
       { name: 'Themes', hash: '#themes', title: 'Theme Variations' }
     ];
 
     for (const variation of variations) {
-      await page.click(`nav a:has-text("${variation.name}")`);
-      
-      // Check URL hash changed
+      await page.click(`nav a[href="${variation.hash}"]`);
+
       expect(page.url()).toContain(variation.hash);
-      
-      // Check active navigation item
       await expect(page.locator(`nav a[href="${variation.hash}"]`)).toHaveClass(/active/);
-      
-      // Check variation content loaded
       await expect(page.locator('h2')).toHaveText(variation.title);
-      
-      // Wait a bit for content to load
-      await page.waitForTimeout(500);
+    }
+  });
+
+  test('displays each variation card with the configured props', async ({ page }) => {
+    const variations: Record<string, Array<{ name: string; props: string }>> = {
+      themes: [
+        { name: 'Light Theme', props: '{"theme":"light"}' },
+        { name: 'Dark Theme', props: '{"theme":"dark"}' },
+        { name: 'System Theme', props: '{"theme":"system"}' },
+      ],
+      alignment: [
+        { name: 'Left Aligned', props: '{"align":"left"}' },
+        { name: 'Center Aligned', props: '{"align":"center"}' },
+        { name: 'Right Aligned', props: '{"align":"right"}' },
+        { name: 'No Alignment (undefined)', props: 'Default props' },
+      ],
+      width: [
+        { name: 'Auto Width', props: '{"width":"auto"}' },
+        { name: 'Minimum Width (250px)', props: '{"width":250}' },
+        { name: 'Medium Width (400px)', props: '{"width":400}' },
+        { name: 'Maximum Width (550px)', props: '{"width":550}' },
+      ],
+      cards: [
+        { name: 'Cards Visible', props: '{"cards":"visible"' },
+        { name: 'Cards Hidden', props: '{"cards":"hidden"' },
+      ],
+      conversation: [
+        { name: 'Show All Conversations', props: '{"conversation":"all"}' },
+        { name: 'Hide Conversations', props: '{"conversation":"none"}' },
+      ],
+      languages: [
+        { name: 'English', props: '{"lang":"en"}' },
+        { name: 'Spanish', props: '{"lang":"es"}' },
+      ],
+      dnt: [
+        { name: 'DNT Enabled', props: '{"dnt":true}' },
+      ],
+      tweetId: [
+        { name: 'Vue.js Tweet by ID', props: '{"tweetId":"1753678159067881809"}' },
+        { name: 'BabylonBee Tweet by ID', props: '{"tweetId":"1945287318044025338"}' },
+        { name: 'Tweet ID with Theme', props: '{"tweetId":"1753678159067881809","theme":"dark"}' },
+        { name: 'Tweet ID with Alignment', props: '{"tweetId":"1945287318044025338","align":"center"}' },
+      ],
+      slots: [
+        { name: 'Custom Loading Slot', props: 'Default props' },
+        { name: 'Custom Error Slot (use invalid URL)', props: '{"tweetUrl":"https://invalid-url"}' },
+      ],
+      callbacks: [
+        { name: 'Success Callback', props: 'Default props' },
+        { name: 'Error Callback (invalid URL)', props: '{"tweetUrl":"https://invalid-url"}' },
+      ],
+      errors: [
+        { name: 'Invalid URL', props: '{"tweetUrl":"https://invalid-url"}' },
+        { name: 'Both ID and URL', props: '{"tweetId":"1753678159067881809","tweetUrl":"https://x.com/vuejs/status/1753678159067881809"}' },
+        { name: 'Non-numeric ID', props: '{"tweetId":"not-a-number"}' },
+        { name: 'URL with Query String', props: '{"tweetUrl":"https://x.com/vuejs/status/1753678159067881809?s=20&t=abc123"}' },
+      ],
+      combined: [
+        { name: 'Dark Theme + Right Aligned + 400px', props: '{"theme":"dark","align":"right","width":400}' },
+        { name: 'Light Theme + Center + Hidden Cards', props: '{"theme":"light","align":"center","cards":"hidden"}' },
+        { name: 'Dark + No Conversation + Spanish', props: '{"theme":"dark","conversation":"none","lang":"es"}' },
+        { name: 'Tweet ID + All Options Combined', props: '{"tweetId":"1753678159067881809","theme":"dark","align":"center","width":450,"cards":"visible","conversation":"all","lang":"en"}' },
+      ],
+    };
+
+    for (const [hash, cards] of Object.entries(variations)) {
+      await page.goto(`/#${hash}`);
+
+      for (let i = 0; i < cards.length; i++) {
+        await expect(page.locator('h3').nth(i)).toHaveText(cards[i].name);
+        await expect(page.locator('.test-props').nth(i)).toContainText(cards[i].props);
+      }
     }
   });
 });
 
-test.describe('Vue Tweet Playground - Theme Variations', () => {
+test.describe('Validation errors (no network)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/#themes');
+    await blockTwitterNetwork(page);
+    await page.goto('/#errors');
   });
 
-  test('should display theme variations with correct props', async ({ page }) => {
-    // Check Light Theme test
-    await expect(page.locator('h3').first()).toHaveText('Light Theme');
-    await expect(page.locator('.test-props').first()).toContainText('{"theme":"light"}');
-    
-    // Check Dark Theme test
-    await expect(page.locator('h3').nth(1)).toHaveText('Dark Theme');
-    await expect(page.locator('.test-props').nth(1)).toContainText('{"theme":"dark"}');
-  });
-
-  test('should render tweets for theme variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 2 tweets (light and dark theme)
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(2);
-    
-    // Check tweets are rendered
-    const firstIframe = page.frameLocator('iframe').first();
-    await expect(firstIframe.locator('article').first()).toBeVisible();
-    
-    const secondIframe = page.frameLocator('iframe').nth(1);
-    await expect(secondIframe.locator('article').first()).toBeVisible();
-  });
-});
-
-test.describe('Vue Tweet Playground - Alignment Variations', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#alignment');
-  });
-
-  test('should display alignment variations with correct props', async ({ page }) => {
-    const alignments = [
-      { name: 'Left Aligned', props: '{"align":"left"}' },
-      { name: 'Center Aligned', props: '{"align":"center"}' },
-      { name: 'Right Aligned', props: '{"align":"right"}' },
-      { name: 'No Alignment (undefined)', props: 'Default props' }
+  test('shows a specific error message and emits tweet-load-error for each invalid input', async ({ page }) => {
+    const cases = [
+      { name: 'Invalid URL', message: 'Invalid tweet-url.' },
+      { name: 'Both ID and URL', message: 'Cannot provide both tweet-id and tweet-url.' },
+      { name: 'Non-numeric ID', message: 'Invalid tweet-id, please provide a valid numerical tweet-id.' },
     ];
 
-    for (let i = 0; i < alignments.length; i++) {
-      await expect(page.locator('h3').nth(i)).toHaveText(alignments[i].name);
-      await expect(page.locator('.test-props').nth(i)).toContainText(alignments[i].props);
+    for (const { name, message } of cases) {
+      const item = card(page, name);
+      // The error slot proves hasError is set; the callback status proves the event was emitted
+      await expect(item.locator('.custom-error')).toContainText(`❌ Custom Error Slot: ${message}`);
+      await expect(item.locator('.callback-status')).toHaveText(`❌ Error: ${message}`);
     }
   });
 
-  test('should render tweets for alignment variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 4 tweets (left, center, right, none)
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(4);
-    
-    // Check first 4 tweets are rendered
-    for (let i = 0; i < 4; i++) {
-      const iframe = page.frameLocator('iframe').nth(i);
-      await expect(iframe.locator('article').first()).toBeVisible();
-    }
+  test('accepts a share URL with a query string', async ({ page }) => {
+    // With the network blocked the only possible failure is the script load —
+    // if URL parsing rejected the query string we'd see "Invalid tweet-url." instead.
+    const item = card(page, 'URL with Query String');
+    await expect(item.locator('.custom-error')).toContainText('Failed to load the Twitter widgets script.');
   });
 });
 
-test.describe('Vue Tweet Playground - Width Variations', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#width');
+test.describe('Loading and script-failure states (no network)', () => {
+  test('shows the loading slot while the Twitter script is pending', async ({ page }) => {
+    await blockTwitterNetwork(page);
+    // Hold widgets.js open forever so the component stays in its loading state
+    await page.route('**/widgets.js*', () => { /* never fulfill */ });
+
+    // The held script request keeps the window 'load' event from firing,
+    // so only wait for DOMContentLoaded
+    await page.goto('/#slots', { waitUntil: 'domcontentloaded' });
+
+    const loading = card(page, 'Custom Loading Slot').locator('.custom-loading');
+    await expect(loading).toBeVisible();
+    await expect(loading).toContainText('🔄 Custom Loading Slot...');
   });
 
-  test('should display width variations with correct props', async ({ page }) => {
-    const widths = [
-      { name: 'Auto Width', props: '{"width":"auto"}' },
-      { name: 'Minimum Width (250px)', props: '{"width":250}' },
-      { name: 'Medium Width (400px)', props: '{"width":400}' },
-      { name: 'Maximum Width (550px)', props: '{"width":550}' }
-    ];
-
-    for (let i = 0; i < widths.length; i++) {
-      await expect(page.locator('h3').nth(i)).toHaveText(widths[i].name);
-      await expect(page.locator('.test-props').nth(i)).toContainText(widths[i].props);
-    }
-  });
-
-  test('should render tweets for width variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 4 tweets for different widths
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(4);
-    
-    // Check first 4 tweets are rendered
-    for (let i = 0; i < 4; i++) {
-      const iframe = page.frameLocator('iframe').nth(i);
-      await expect(iframe.locator('article').first()).toBeVisible();
-    }
-  });
-});
-
-test.describe('Vue Tweet Playground - Cards Variations', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#cards');
-  });
-
-  test('should display cards variations with correct props', async ({ page }) => {
-    await expect(page.locator('h3').first()).toHaveText('Cards Visible');
-    await expect(page.locator('.test-props').first()).toContainText('{"cards":"visible"');
-    
-    await expect(page.locator('h3').nth(1)).toHaveText('Cards Hidden');
-    await expect(page.locator('.test-props').nth(1)).toContainText('{"cards":"hidden"');
-  });
-
-  test('should render tweets for cards variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 2 tweets (visible and hidden cards)
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(2);
-    
-    // Check first 2 tweets are rendered
-    for (let i = 0; i < 2; i++) {
-      const iframe = page.frameLocator('iframe').nth(i);
-      await expect(iframe.locator('article').first()).toBeVisible();
-    }
-  });
-});
-
-test.describe('Vue Tweet Playground - Conversation Variations', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#conversation');
-  });
-
-  test('should display conversation variations with correct props', async ({ page }) => {
-    await expect(page.locator('h3').first()).toHaveText('Show All Conversations');
-    await expect(page.locator('.test-props').first()).toContainText('{"conversation":"all"}');
-    
-    await expect(page.locator('h3').nth(1)).toHaveText('Hide Conversations');
-    await expect(page.locator('.test-props').nth(1)).toContainText('{"conversation":"none"}');
-  });
-
-  test('should render tweets for conversation variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 2 tweets (all and none conversation)
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(2);
-    
-    // Check first 2 tweets are rendered
-    for (let i = 0; i < 2; i++) {
-      const iframe = page.frameLocator('iframe').nth(i);
-      await expect(iframe.locator('article').first()).toBeVisible();
-    }
-  });
-
-  test('should verify conversation behavior - show all vs hide conversations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Get both iframes
-    const showAllIframe = page.frameLocator('iframe').first(); // Show All Conversations
-    const hideConversationIframe = page.frameLocator('iframe').nth(1); // Hide Conversations
-    
-    // Wait for content to load in both iframes
-    await expect(showAllIframe.locator('article').first()).toBeVisible();
-    await expect(hideConversationIframe.locator('article').first()).toBeVisible();
-    
-    // Count articles (tweets) in each iframe
-    const showAllArticleCount = await showAllIframe.locator('article').count();
-    const hideConversationArticleCount = await hideConversationIframe.locator('article').count();
-    
-    // When showing all conversations, there should be more articles (original + replies)
-    // When hiding conversations, there should be fewer articles (just the reply)
-    expect(showAllArticleCount).toBeGreaterThan(hideConversationArticleCount);
-    
-    // Verify the "Show All Conversations" iframe has multiple tweets (conversation thread)
-    expect(showAllArticleCount).toBeGreaterThan(hideConversationArticleCount);
-    
-    // For tweets with replies, Show All should typically have 2+ tweets (original + replies)
-    expect(showAllArticleCount).toBeGreaterThanOrEqual(2);
-    
-    // Hide Conversations should typically have 1 tweet (just the reply)
-    expect(hideConversationArticleCount).toBeGreaterThanOrEqual(1);
-    
-    // Additional verification: check that both iframes have tweet content
-    await expect(showAllIframe.locator('article').first()).toBeVisible();
-    await expect(hideConversationIframe.locator('article').first()).toBeVisible();
-  });
-});
-
-test.describe('Vue Tweet Playground - Language Variations', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#languages');
-  });
-
-  test('should display language variations with correct props', async ({ page }) => {
-    await expect(page.locator('h3').first()).toHaveText('English');
-    await expect(page.locator('.test-props').first()).toContainText('{"lang":"en"}');
-    
-    await expect(page.locator('h3').nth(1)).toHaveText('Spanish');
-    await expect(page.locator('.test-props').nth(1)).toContainText('{"lang":"es"}');
-  });
-
-  test('should render tweets for language variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 2 tweets (English and Spanish)
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(2);
-    
-    // Check first 2 tweets are rendered
-    for (let i = 0; i < 2; i++) {
-      const iframe = page.frameLocator('iframe').nth(i);
-      await expect(iframe.locator('article').first()).toBeVisible();
-    }
-  });
-});
-
-test.describe('Vue Tweet Playground - Tweet ID Variations', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#tweetId');
-  });
-
-  test('should display tweet ID variations with correct props', async ({ page }) => {
-    const tweetIds = [
-      { name: 'Vue.js Tweet by ID', props: '{"tweetId":"1753678159067881809"}' },
-      { name: 'BabylonBee Tweet by ID', props: '{"tweetId":"1945287318044025338"}' },
-      { name: 'Tweet ID with Theme', props: '{"tweetId":"1753678159067881809","theme":"dark"}' },
-      { name: 'Tweet ID with Alignment', props: '{"tweetId":"1945287318044025338","align":"center"}' }
-    ];
-
-    for (let i = 0; i < tweetIds.length; i++) {
-      await expect(page.locator('h3').nth(i)).toHaveText(tweetIds[i].name);
-      await expect(page.locator('.test-props').nth(i)).toContainText(tweetIds[i].props);
-    }
-  });
-
-  test('should render tweets for tweet ID variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 4 tweets for different tweet IDs
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(4);
-    
-    // Check first 4 tweets are rendered
-    for (let i = 0; i < 4; i++) {
-      const iframe = page.frameLocator('iframe').nth(i);
-      await expect(iframe.locator('article').first()).toBeVisible();
-    }
-  });
-});
-
-test.describe('Vue Tweet Playground - Slots Variations', () => {
-  test.beforeEach(async ({ page }) => {
+  test('shows the error slot when the Twitter script fails to load', async ({ page }) => {
+    await blockTwitterNetwork(page);
     await page.goto('/#slots');
-  });
 
-  test('should display slots variations with correct props', async ({ page }) => {
-    await expect(page.locator('h3').first()).toHaveText('Custom Loading Slot');
-    await expect(page.locator('.test-props').first()).toContainText('Default props');
-    
-    await expect(page.locator('h3').nth(1)).toHaveText('Custom Error Slot (use invalid URL)');
-    await expect(page.locator('.test-props').nth(1)).toContainText('{"tweetUrl":"https://invalid-url"}');
-  });
-
-  test('should show custom loading slot or tweet loaded', async ({ page }) => {
-    // Either custom loading slot is visible (if tweet loads slowly) or tweet is loaded
-    const customLoading = page.locator('.custom-loading');
-    const tweetIframe = page.locator('iframe[title="X Post"]');
-    
-    // Check if custom loading slot appears or tweet loads directly
-    try {
-      await expect(customLoading).toBeVisible({ timeout: 1000 });
-      await expect(customLoading.locator('span')).toContainText('🔄 Custom Loading Slot...');
-    } catch {
-      // If custom loading slot is not visible, check that tweet loaded
-      await expect(tweetIframe).toBeVisible({ timeout: 15000 });
-    }
-  });
-
-  test('should show custom error slot for invalid URL', async ({ page }) => {
-    // Check for custom error slot
-    await expect(page.locator('.custom-error')).toBeVisible();
-    await expect(page.locator('.custom-error')).toContainText('❌ Custom Error Slot:');
+    const item = card(page, 'Custom Loading Slot');
+    await expect(item.locator('.custom-error')).toContainText('Failed to load the Twitter widgets script.');
   });
 });
 
-test.describe('Vue Tweet Playground - Callbacks Variations', () => {
-  test.beforeEach(async ({ page }) => {
+test.describe('Live Twitter embeds (network)', () => {
+  test('renders a tweet and fires tweet-load-success', async ({ page }) => {
     await page.goto('/#callbacks');
+
+    const item = card(page, 'Success Callback');
+    await expect(item.locator('.callback-status')).toHaveText('✅ Loaded', { timeout: LIVE_TIMEOUT });
+    await expect(item.frameLocator('iframe').locator('article').first()).toBeVisible({ timeout: LIVE_TIMEOUT });
+    // dnt defaults to false; asserted here because no embed on this page enables
+    // DNT (widgets.js applies DNT page-globally once one embed opts in)
+    await expect(item.locator('iframe')).toHaveAttribute('src', /dnt=false/);
   });
 
-  test('should display callbacks variations with correct props', async ({ page }) => {
-    await expect(page.locator('h3').first()).toHaveText('Success Callback');
-    await expect(page.locator('.test-props').first()).toContainText('Default props');
-    
-    await expect(page.locator('h3').nth(1)).toHaveText('Error Callback (invalid URL)');
-    await expect(page.locator('.test-props').nth(1)).toContainText('{"tweetUrl":"https://invalid-url"}');
+  test('applies light, dark, and system themes', async ({ page }) => {
+    await page.emulateMedia({ colorScheme: 'dark' });
+    await page.goto('/#themes');
+
+    await expect(card(page, 'Light Theme').locator('iframe')).toHaveAttribute('src', /theme=light/, { timeout: LIVE_TIMEOUT });
+    await expect(card(page, 'Dark Theme').locator('iframe')).toHaveAttribute('src', /theme=dark/, { timeout: LIVE_TIMEOUT });
+    await expect(card(page, 'System Theme').locator('iframe')).toHaveAttribute('src', /theme=dark/, { timeout: LIVE_TIMEOUT });
+
+    // The theme visibly affects the rendered tweet, not just the embed URL
+    expect(await articleLuminance(card(page, 'Dark Theme'))).toBeLessThan(100);
+    expect(await articleLuminance(card(page, 'Light Theme'))).toBeGreaterThan(200);
+
+    // Flipping the OS color scheme re-renders only the system-theme tweet
+    await page.emulateMedia({ colorScheme: 'light' });
+    await expect(card(page, 'System Theme').locator('iframe')).toHaveAttribute('src', /theme=light/, { timeout: LIVE_TIMEOUT });
+    await expect(card(page, 'Dark Theme').locator('iframe')).toHaveAttribute('src', /theme=dark/);
   });
 
-  test('should show callback info for both variations', async ({ page }) => {
-    // Check callback info is displayed
-    const callbackInfoElements = page.locator('.callback-info');
-    await expect(callbackInfoElements).toHaveCount(2);
-    
-    for (let i = 0; i < 2; i++) {
-      await expect(callbackInfoElements.nth(i)).toContainText('Check console for callback logs');
-    }
+  test('passes the conversation option to the embed', async ({ page }) => {
+    await page.goto('/#conversation');
+
+    await expect(card(page, 'Show All Conversations').locator('iframe')).toHaveAttribute('src', /hideThread=false/, { timeout: LIVE_TIMEOUT });
+    await expect(card(page, 'Hide Conversations').locator('iframe')).toHaveAttribute('src', /hideThread=true/, { timeout: LIVE_TIMEOUT });
   });
 
-  test('should render tweet for success callback', async ({ page }) => {
-    // Wait for tweet to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have at least 1 tweet for success callback
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(1);
-    
-    // Check first tweet is rendered
-    const firstIframe = page.frameLocator('iframe').first();
-    await expect(firstIframe.locator('article').first()).toBeVisible();
+  test('passes the language option to the embed', async ({ page }) => {
+    await page.goto('/#languages');
+
+    await expect(card(page, 'English').locator('iframe')).toHaveAttribute('src', /lang=en/, { timeout: LIVE_TIMEOUT });
+    await expect(card(page, 'Spanish').locator('iframe')).toHaveAttribute('src', /lang=es/, { timeout: LIVE_TIMEOUT });
+
+    // The embed document is actually localized (we assert the document language,
+    // not Twitter's translated copy, which can change)
+    await expect(card(page, 'English').frameLocator('iframe').locator('html')).toHaveAttribute('lang', 'en', { timeout: LIVE_TIMEOUT });
+    await expect(card(page, 'Spanish').frameLocator('iframe').locator('html')).toHaveAttribute('lang', 'es', { timeout: LIVE_TIMEOUT });
+  });
+
+  test('shows or hides the link-preview card', async ({ page }) => {
+    await page.goto('/#cards');
+
+    const visible = card(page, 'Cards Visible');
+    const hidden = card(page, 'Cards Hidden');
+    await expect(visible.locator('iframe')).toHaveAttribute('src', /hideCard=false/, { timeout: LIVE_TIMEOUT });
+    await expect(hidden.locator('iframe')).toHaveAttribute('src', /hideCard=true/, { timeout: LIVE_TIMEOUT });
+
+    // Same tweet rendered twice: the link-preview card adds an extra image
+    await expect(visible.frameLocator('iframe').locator('article').first()).toBeVisible({ timeout: LIVE_TIMEOUT });
+    await expect(hidden.frameLocator('iframe').locator('article').first()).toBeVisible({ timeout: LIVE_TIMEOUT });
+    await expect
+      .poll(async () => {
+        const visibleImages = await visible.frameLocator('iframe').locator('img').count();
+        const hiddenImages = await hidden.frameLocator('iframe').locator('img').count();
+        return visibleImages - hiddenImages;
+      }, { timeout: LIVE_TIMEOUT })
+      .toBeGreaterThan(0);
+  });
+
+  test('applies the requested width to the embed', async ({ page }) => {
+    await page.goto('/#width');
+
+    const iframe = card(page, 'Minimum Width (250px)').locator('iframe');
+    await expect(iframe).toBeVisible({ timeout: LIVE_TIMEOUT });
+    await expect.poll(async () => (await iframe.boundingBox())?.width, { timeout: LIVE_TIMEOUT }).toBe(250);
+  });
+
+  test('passes the dnt option to the embed', async ({ page }) => {
+    await page.goto('/#dnt');
+
+    await expect(card(page, 'DNT Enabled').locator('iframe')).toHaveAttribute('src', /dnt=true/, { timeout: LIVE_TIMEOUT });
+  });
+
+  test('renders a tweet from a share URL with a query string', async ({ page }) => {
+    await page.goto('/#errors');
+
+    const item = card(page, 'URL with Query String');
+    await expect(item.frameLocator('iframe').locator('article').first()).toBeVisible({ timeout: LIVE_TIMEOUT });
+    await expect(item.locator('.callback-status')).toHaveText('✅ Loaded', { timeout: LIVE_TIMEOUT });
+  });
+
+  test('renders a tweet with combined props', async ({ page }) => {
+    await page.goto('/#combined');
+
+    const item = card(page, 'Dark Theme + Right Aligned + 400px');
+    await expect(item.locator('iframe')).toHaveAttribute('src', /theme=dark/, { timeout: LIVE_TIMEOUT });
+    await expect(item.frameLocator('iframe').locator('article').first()).toBeVisible({ timeout: LIVE_TIMEOUT });
   });
 });
-
-test.describe('Vue Tweet Playground - Combined Variations', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('/#combined');
-  });
-
-  test('should display combined variations with correct props', async ({ page }) => {
-    const combined = [
-      { name: 'Dark Theme + Right Aligned + 400px', props: '{"theme":"dark","align":"right","width":400}' },
-      { name: 'Light Theme + Center + Hidden Cards', props: '{"theme":"light","align":"center","cards":"hidden"}' },
-      { name: 'Dark + No Conversation + Spanish', props: '{"theme":"dark","conversation":"none","lang":"es"}' },
-      { name: 'Tweet ID + All Options Combined', props: '{"tweetId":"1753678159067881809","theme":"dark","align":"center","width":450,"cards":"visible","conversation":"all","lang":"en"}' }
-    ];
-
-    for (let i = 0; i < combined.length; i++) {
-      await expect(page.locator('h3').nth(i)).toHaveText(combined[i].name);
-      await expect(page.locator('.test-props').nth(i)).toContainText(combined[i].props);
-    }
-  });
-
-  test('should render tweets for combined variations', async ({ page }) => {
-    // Wait for tweets to load
-    await page.waitForSelector('iframe', { timeout: 15000 });
-    
-    // Should have 4 tweets for combined variations
-    const iframes = await page.locator('iframe').count();
-    expect(iframes).toBeGreaterThanOrEqual(4);
-    
-    // Check first 4 tweets are rendered
-    for (let i = 0; i < 4; i++) {
-      const iframe = page.frameLocator('iframe').nth(i);
-      await expect(iframe.locator('article').first()).toBeVisible();
-    }
-  });
-}); 

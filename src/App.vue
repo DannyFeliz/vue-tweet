@@ -17,14 +17,18 @@ interface VariationConfig {
 
 const currentHash = ref(window.location.hash.slice(1) || 'themes')
 
-function onTweetLoadSuccess(embedNode: HTMLDivElement) {
-  console.log('onTweetLoadSuccess callback', embedNode)
+const tweetStatuses = ref<Record<string, 'success' | 'error'>>({})
+const tweetErrors = ref<Record<string, Error>>({})
+
+function onTweetLoadSuccess(testName: string, embedNode: HTMLDivElement) {
+  tweetStatuses.value[testName] = 'success'
+  console.log('onTweetLoadSuccess callback', testName, embedNode)
 }
 
-const tweetError = ref<Error | null>(null)
-function onTweetLoadError(error: Error) {
-  tweetError.value = error
-  console.log('onTweetLoadError callback', error)
+function onTweetLoadError(testName: string, error: Error) {
+  tweetStatuses.value[testName] = 'error'
+  tweetErrors.value[testName] = error
+  console.log('onTweetLoadError callback', testName, error)
 }
 
 function updateHash() {
@@ -96,6 +100,15 @@ const variations = computed((): Record<string, VariationConfig> => {
         { name: 'Spanish', props: { lang: 'es' } },
       ]
     },
+    dnt: {
+      title: 'DNT Variations',
+      description: 'Test the Do Not Track privacy option',
+      tests: [
+        // Only one card: widgets.js applies DNT page-globally, so a dnt=false
+        // embed next to this one would report dnt=true anyway
+        { name: 'DNT Enabled', props: { dnt: true } },
+      ]
+    },
     tweetId: {
       title: 'Tweet ID Variations',
       description: 'Test using tweetId prop instead of tweetUrl',
@@ -120,6 +133,16 @@ const variations = computed((): Record<string, VariationConfig> => {
       tests: [
         { name: 'Success Callback', props: {}, hasCallbacks: true },
         { name: 'Error Callback (invalid URL)', props: { tweetUrl: 'https://invalid-url' }, hasCallbacks: true },
+      ]
+    },
+    errors: {
+      title: 'Error Handling',
+      description: 'Test validation errors and URL parsing',
+      tests: [
+        { name: 'Invalid URL', props: { tweetUrl: 'https://invalid-url' }, hasCustomSlots: true, hasCallbacks: true },
+        { name: 'Both ID and URL', props: { tweetId: '1753678159067881809', tweetUrl }, hasCustomSlots: true, hasCallbacks: true },
+        { name: 'Non-numeric ID', props: { tweetId: 'not-a-number' }, hasCustomSlots: true, hasCallbacks: true },
+        { name: 'URL with Query String', props: { tweetUrl: `${tweetUrl}?s=20&t=abc123` }, hasCustomSlots: true, hasCallbacks: true },
       ]
     },
     combined: {
@@ -202,7 +225,7 @@ const navigationItems = computed(() => {
           <div class="tweet-container">
             <vue-tweet
               :tweet-id="test.props.tweetId"
-              :tweet-url="test.props.tweetId ? undefined : (test.props.tweetUrl || tweetUrl)"
+              :tweet-url="test.props.tweetUrl ?? (test.props.tweetId ? undefined : tweetUrl)"
               :theme="test.props.theme"
               :align="test.props.align"
               :width="test.props.width"
@@ -210,8 +233,8 @@ const navigationItems = computed(() => {
               :conversation="test.props.conversation"
               :lang="test.props.lang"
               :dnt="test.props.dnt"
-              @tweet-load-error="onTweetLoadError"
-              @tweet-load-success="onTweetLoadSuccess"
+              @tweet-load-error="(error: Error) => onTweetLoadError(test.name, error)"
+              @tweet-load-success="(embedNode: HTMLDivElement) => onTweetLoadSuccess(test.name, embedNode)"
             >
               <template #loading v-if="test.hasCustomSlots">
                 <div class="custom-loading">
@@ -221,14 +244,17 @@ const navigationItems = computed(() => {
 
               <template #error v-if="test.hasCustomSlots">
                 <div class="custom-error">
-                  <span>❌ Custom Error Slot: {{ tweetError?.message }}</span>
+                  <span>❌ Custom Error Slot: {{ tweetErrors[test.name]?.message }}</span>
                 </div>
               </template>
             </vue-tweet>
           </div>
 
           <div v-if="test.hasCallbacks" class="callback-info">
-            <strong>Callbacks:</strong> Check console for callback logs
+            <strong>Callbacks:</strong>
+            <span v-if="tweetStatuses[test.name] === 'success'" class="callback-status">✅ Loaded</span>
+            <span v-else-if="tweetStatuses[test.name] === 'error'" class="callback-status">❌ Error: {{ tweetErrors[test.name]?.message }}</span>
+            <span v-else class="callback-status">⏳ Waiting for tweet...</span>
           </div>
         </div>
       </div>
@@ -370,6 +396,10 @@ const navigationItems = computed(() => {
   border-radius: 4px;
   font-size: 0.9em;
   color: #f57c00;
+}
+
+.callback-status {
+  margin-left: 6px;
 }
 
 @media (max-width: 768px) {
