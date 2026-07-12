@@ -1,15 +1,5 @@
 /// <reference types="vite/client" />
 
-declare module 'vue' {
-  interface ComponentCustomProperties {
-    $attrs: Record<string, unknown>
-  }
-
-  interface ComponentInternalInstance {
-    setupState: Record<string, unknown>
-  }
-}
-
 declare global {
   interface Window {
     twttr?: {
