@@ -34,7 +34,7 @@
     "test": "playwright test"
   },
   "peerDependencies": {
-    "vue": "^3.5.29"
+    "vue": "^3.3.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
@@ -54,17 +54,14 @@
   },
   "keywords": [
     "vue",
-    "vue-2",
     "vue-3",
     "vue-tweet",
     "vue3-tweet",
-    "vue-tweet",
     "twitter-tweet",
     "embed",
     "twitter",
     "twitter-widget",
-    "twitter-embed",
-    "vue-tweet"
+    "twitter-embed"
   ],
   "author": "Danny Feliz <dannyfeliz08@gmail.com>",
   "license": "MIT",
