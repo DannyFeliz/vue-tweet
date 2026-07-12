@@ -26,11 +26,10 @@
     "build": "vite build && npm run copy-types",
     "preview": "vite preview",
     "build-only": "vite build",
-    "generate-types": "vue-tsc -p tsconfig.app.json --declaration --emitDeclarationOnly --declarationDir dist && npm run copy-types",
     "type-check": "vue-tsc --build --noEmit",
     "lint": "oxlint",
     "generate-tag": "np --no-2fa --no-tests --no-publish",
-    "publish-package": "npm run type-check && npm run lint && npm run build && npm run generate-types && npm run generate-tag && npm publish --access public",
+    "publish-package": "npm run type-check && npm run lint && npm run build && npm run generate-tag && npm publish --access public",
     "copy-types": "cp ./dist/index.d.ts ./dist/index.d.cts",
     "test": "playwright test"
   },
