@@ -17,7 +17,6 @@
     "useDefineForClassFields": true,
     "target": "ES2018",
     "lib": ["ES2018", "DOM", "DOM.Iterable"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },

@@ -15,7 +15,7 @@ export default defineConfig({
       include: ['src/**/*.vue', 'src/**/*.ts', 'env.d.ts'],
       insertTypesEntry: true,
       staticImport: true,
-      rollupTypes: true,
+      bundleTypes: true,
       copyDtsFiles: true,
       exclude: ['src/**/*.test.ts', 'src/**/*.spec.ts'],
       tsconfigPath: './tsconfig.app.json',
