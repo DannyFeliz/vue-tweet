@@ -65,7 +65,7 @@ const props = defineProps({
     },
   },
   align: {
-    type: [String, undefined] as PropType<'left' | 'right' | 'center' | undefined>,
+    type: String as PropType<'left' | 'right' | 'center'>,
     default: undefined,
     validator: (value: string | undefined) =>
       ['left', 'right', 'center', undefined].includes(value),
@@ -87,26 +87,30 @@ const props = defineProps({
 
 const emit = defineEmits(['tweet-load-success', 'tweet-load-error'])
 
+const TWITTER_SCRIPT_URL = 'https://platform.twitter.com/widgets.js'
+const SCRIPT_LOAD_TIMEOUT_MS = 30000
+const SCRIPT_POLL_INTERVAL_MS = 100
+const TWEET_URL_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:twitter|x)\.com\/.+?\/status(?:es)?\/(\d+)(?:[/?#]|$)/i
+
 const isLoading = ref(true)
 const hasError = ref(false)
 const tweetContainerRef = ref<HTMLDivElement>()
-const activeTimers: ReturnType<typeof setTimeout | typeof setInterval>[] = []
+const activeTimers: ReturnType<typeof setInterval>[] = []
 
-const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+// Created in onMounted so importing/rendering the component doesn't touch `window` (SSR-safe)
+let darkModeMediaQuery: MediaQueryList | undefined
+const lastSystemTheme = ref<TweetWidgetTheme>('light')
 
 function getSystemTheme(): TweetWidgetTheme {
-  return darkModeMediaQuery.matches ? 'dark' : 'light'
+  return darkModeMediaQuery?.matches ? 'dark' : 'light'
 }
-
-// Tracks the last known system theme so we can detect actual changes
-const lastSystemTheme = ref<TweetWidgetTheme>(getSystemTheme())
 
 const resolvedTheme = computed<TweetWidgetTheme>(() =>
   props.theme === 'system' ? lastSystemTheme.value : props.theme
 )
 
-function onSystemThemeChange(event: MediaQueryListEvent): void {
-  const newTheme: TweetWidgetTheme = event.matches ? 'dark' : 'light'
+function onSystemThemeChange(): void {
+  const newTheme = getSystemTheme()
   if (newTheme !== lastSystemTheme.value) {
     lastSystemTheme.value = newTheme
     // Re-render the tweet with the updated OS theme
@@ -115,14 +119,16 @@ function onSystemThemeChange(event: MediaQueryListEvent): void {
 }
 
 function startListeningToSystemTheme(): void {
-  darkModeMediaQuery.addEventListener('change', onSystemThemeChange)
+  darkModeMediaQuery?.addEventListener('change', onSystemThemeChange)
 }
 
 function stopListeningToSystemTheme(): void {
-  darkModeMediaQuery.removeEventListener('change', onSystemThemeChange)
+  darkModeMediaQuery?.removeEventListener('change', onSystemThemeChange)
 }
 
 onMounted(() => {
+  darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+  lastSystemTheme.value = getSystemTheme()
   if (props.theme === 'system') {
     startListeningToSystemTheme()
   }
@@ -131,7 +137,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopListeningToSystemTheme()
-  activeTimers.forEach(clearTimeout)
+  activeTimers.forEach(clearInterval)
   activeTimers.length = 0
 })
 
@@ -149,45 +155,46 @@ watch(() => props.theme, (newTheme, oldTheme) => {
   }
 })
 
+function setError(error: Error): void {
+  hasError.value = true
+  isLoading.value = false
+  emit('tweet-load-error', error)
+}
+
 function renderTweet(): void {
-  // If script is not loaded and not currently loading, load it
-  if (!window.twttr && !window.___$twitterScriptLoaded___ && !window.___$twitterScriptLoading___) {
-    addScript('https://platform.twitter.com/widgets.js', renderTweet);
+  const params = getTweetParams()
+  if (!params) {
     return
   }
 
-  // If script is loaded or available, proceed with rendering
-  if (window.twttr) {
-    renderTweetContent()
-  } else {
-    // If script is loading, wait for it to be ready
-    const waitForScript = () => {
-      if (window.twttr) {
-        renderTweetContent()
-      } else {
-        activeTimers.push(setTimeout(waitForScript, 150))
-      }
-    }
-    waitForScript()
-  }
+  loadTwitterScript()
+    .then(() => renderTweetContent(params))
+    .catch((error: Error) => {
+      console.error('Error loading Twitter widget:', error)
+      setError(error)
+    })
 }
 
-function renderTweetContent(): void {
-  // Only called after verifying window.twttr exists in renderTweet()
-  window.twttr?.ready().then(({ widgets }) => {
-    isLoading.value = true
-    hasError.value = false
-    // Clear previously rendered tweet before rendering the updated tweet id
-    if (tweetContainerRef.value) {
-      tweetContainerRef.value.innerHTML = ''
-    } else {
-      console.error('tweetContainerRef is null')
+function renderTweetContent(params: { tweetId: string; tweetOptions: Record<string, unknown> }): Promise<void> {
+  isLoading.value = true
+  hasError.value = false
+
+  if (!window.twttr) {
+    return Promise.reject(new Error('Failed to load the Twitter widgets script.'))
+  }
+
+  return window.twttr.ready().then(({ widgets }) => {
+    const container = tweetContainerRef.value
+    if (!container) {
+      // The component was unmounted while the script was loading
       return
     }
 
-    const { tweetId, tweetOptions } = getTweetParams()
-    widgets
-      .createTweet(tweetId, tweetContainerRef.value, tweetOptions)
+    // Clear previously rendered tweet before rendering the updated tweet
+    container.innerHTML = ''
+
+    return widgets
+      .createTweet(params.tweetId, container, params.tweetOptions)
       .then(async (twitterWidgetElement: HTMLDivElement | undefined) => {
         // Since we're mutating the DOM directly with the embed we need to tell Vue wait until the DOM update
         await nextTick()
@@ -199,24 +206,14 @@ function renderTweetContent(): void {
           emit('tweet-load-error', new Error('Failed to load tweet.'))
         }
       })
-      .finally(() => {
-        isLoading.value = false
-      })
-  }).catch((error: Error) => {
-    console.error('Error loading Twitter widget:', error)
-    hasError.value = true
   }).finally(() => {
     isLoading.value = false
   })
 }
 
-function getTweetParams() {
-  const { tweetId: rawTweetId, tweetUrl: rawTweetUrl, ...tweetOptions } = props
+function getTweetParams(): { tweetId: string; tweetOptions: Record<string, unknown> } | null {
+  const { tweetId: rawTweetId, tweetUrl, ...tweetOptions } = props
   let tweetId = rawTweetId
-  let tweetUrl = rawTweetUrl
-
-  // Always pass the resolved theme ('dark' | 'light') to the Twitter widget, never 'system'
-  tweetOptions.theme = resolvedTheme.value
 
   let error: Error | null = null
   if (tweetId && tweetUrl) {
@@ -228,11 +225,9 @@ function getTweetParams() {
       )
     }
   } else if (tweetUrl) {
-    const TWEET_URL_REGEX = /^(https?:\/\/)?(www\.)?(twitter|x)\.com\/.*\/status(?:es)?\/([^/?]\d+)$/i
-
     const match = tweetUrl.trim().match(TWEET_URL_REGEX)
-    if (match && match[4]) {
-      tweetId = match[4]
+    if (match) {
+      tweetId = match[1]
     } else {
       error = new Error('Invalid tweet-url.')
     }
@@ -241,62 +236,55 @@ function getTweetParams() {
   }
 
   if (error) {
-    hasError.value = true
-    isLoading.value = false
-    emit('tweet-load-error', error)
-    throw error
+    setError(error)
+    return null
   }
 
   return {
-    tweetId: tweetId as string,
-    tweetOptions,
+    tweetId,
+    tweetOptions: {
+      ...tweetOptions,
+      // Always pass the resolved theme ('dark' | 'light') to the Twitter widget, never 'system'
+      theme: resolvedTheme.value,
+    },
   }
 }
 
-function addScript(src: string, cb: () => void): void {
-  if (window.___$twitterScriptLoaded___ === undefined) {
-    window.___$twitterScriptLoaded___ = false
-  }
-  if (window.___$twitterScriptLoading___ === undefined) {
-    window.___$twitterScriptLoading___ = false
+function loadTwitterScript(): Promise<void> {
+  if (window.twttr || window.___$twitterScriptLoaded___) {
+    return Promise.resolve()
   }
 
-  // If script is already loaded, execute callback immediately
-  if (window.___$twitterScriptLoaded___) {
-    cb();
-    return;
+  if (!window.___$twitterScriptLoading___) {
+    window.___$twitterScriptLoading___ = true
+
+    const script = document.createElement('script')
+    script.src = TWITTER_SCRIPT_URL
+    script.async = true
+    script.addEventListener('load', () => {
+      window.___$twitterScriptLoaded___ = true
+      window.___$twitterScriptLoading___ = false
+    }, false)
+    script.addEventListener('error', () => {
+      // Reset so a later render can retry; the poll below reports the failure
+      window.___$twitterScriptLoading___ = false
+    }, false)
+    document.body.appendChild(script)
   }
 
-  // If script is currently loading, wait for it to complete
-  if (window.___$twitterScriptLoading___) {
+  // Poll until the script — possibly requested by another component instance — is ready
+  return new Promise((resolve, reject) => {
+    const startedAt = Date.now()
     const waitInterval = setInterval(() => {
-      if (window.___$twitterScriptLoaded___) {
+      if (window.twttr || window.___$twitterScriptLoaded___) {
         clearInterval(waitInterval)
-        cb()
+        resolve()
+      } else if (!window.___$twitterScriptLoading___ || Date.now() - startedAt >= SCRIPT_LOAD_TIMEOUT_MS) {
+        clearInterval(waitInterval)
+        reject(new Error('Failed to load the Twitter widgets script.'))
       }
-    }, 100)
+    }, SCRIPT_POLL_INTERVAL_MS)
     activeTimers.push(waitInterval)
-    return
-  }
-
-  // Set loading state immediately to prevent race conditions
-  window.___$twitterScriptLoading___ = true
-  
-  const s = document.createElement('script')
-  s.setAttribute('src', src)
-  s.async = true
-  s.addEventListener('load', () => {
-    window.___$twitterScriptLoaded___ = true
-    window.___$twitterScriptLoading___ = false
-    cb()
-  }, false)
-  
-  // Handle script load errors
-  s.addEventListener('error', () => {
-    console.error('Failed to load Twitter script')
-    window.___$twitterScriptLoading___ = false
-  }, false)
-  
-  document.body.appendChild(s)
+  })
 }
 </script>
