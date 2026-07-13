@@ -1,0 +1,31 @@
+# Publishes to npm with provenance when a GitHub release is published.
+#
+# Requires an npm automation token stored as the NPM_TOKEN repository secret.
+# Once this workflow is active, remove `npm publish` from the local
+# `publish-package` script so releases aren't published twice.
+name: Publish to npm
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run type-check
+      - run: npm run build
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
