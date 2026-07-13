@@ -242,9 +242,9 @@ const navigationItems = computed(() => {
                 </div>
               </template>
 
-              <template #error v-if="test.hasCustomSlots">
+              <template #error="{ error }" v-if="test.hasCustomSlots">
                 <div class="custom-error">
-                  <span>❌ Custom Error Slot: {{ tweetErrors[test.name]?.message }}</span>
+                  <span>❌ Custom Error Slot: {{ error?.message }}</span>
                 </div>
               </template>
             </vue-tweet>
