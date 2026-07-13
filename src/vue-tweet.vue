@@ -1,5 +1,5 @@
 <template>
-  <slot v-if="hasError" name="error" />
+  <slot v-if="hasError" name="error" :error="lastError" />
   <slot v-else-if="isLoading" name="loading" />
   <div ref="tweetContainerRef" v-bind="$attrs" />
 </template>
@@ -85,7 +85,10 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['tweet-load-success', 'tweet-load-error'])
+const emit = defineEmits<{
+  'tweet-load-success': [twitterWidgetElement: HTMLDivElement]
+  'tweet-load-error': [error: Error]
+}>()
 
 const TWITTER_SCRIPT_URL = 'https://platform.twitter.com/widgets.js'
 const SCRIPT_LOAD_TIMEOUT_MS = 30000
@@ -94,6 +97,7 @@ const TWEET_URL_REGEX = /^(?:https?:\/\/)?(?:www\.)?(?:twitter|x)\.com\/.+?\/sta
 
 const isLoading = ref(true)
 const hasError = ref(false)
+const lastError = ref<Error | null>(null)
 const tweetContainerRef = ref<HTMLDivElement>()
 const activeTimers: ReturnType<typeof setInterval>[] = []
 
@@ -158,8 +162,14 @@ watch(() => props.theme, (newTheme, oldTheme) => {
 function setError(error: Error): void {
   hasError.value = true
   isLoading.value = false
+  lastError.value = error
   emit('tweet-load-error', error)
 }
+
+defineExpose({
+  /** Re-run tweet rendering, e.g. from a "Retry" button in the error slot */
+  reload: () => renderTweet(),
+})
 
 function renderTweet(): void {
   const params = getTweetParams()
@@ -178,6 +188,7 @@ function renderTweet(): void {
 function renderTweetContent(params: { tweetId: string; tweetOptions: Record<string, unknown> }): Promise<void> {
   isLoading.value = true
   hasError.value = false
+  lastError.value = null
 
   if (!window.twttr) {
     return Promise.reject(new Error('Failed to load the Twitter widgets script.'))
@@ -202,8 +213,7 @@ function renderTweetContent(params: { tweetId: string; tweetOptions: Record<stri
         if (twitterWidgetElement) {
           emit('tweet-load-success', twitterWidgetElement)
         } else {
-          hasError.value = true
-          emit('tweet-load-error', new Error('Failed to load tweet.'))
+          setError(new Error('Failed to load tweet.'))
         }
       })
   }).finally(() => {

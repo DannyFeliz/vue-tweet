@@ -1,8 +1,12 @@
 {
   "name": "vue-tweet",
-  "description": "Embed tweets just by giving the ID of a Tweet",
+  "description": "Vue 3 component to embed posts from X (Twitter) by tweet ID or URL",
   "version": "3.0.0",
   "type": "module",
+  "sideEffects": false,
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "files": [
     "dist"
   ],
@@ -39,7 +43,7 @@
   "devDependencies": {
     "@microsoft/api-extractor": "^7.58.9",
     "@playwright/test": "^1.61.1",
-    "@tsconfig/node20": "^20.1.9",
+    "@tsconfig/node22": "^22.0.5",
     "@types/node": "^26.1.1",
     "@vitejs/plugin-vue": "^6.0.7",
     "@vue/tsconfig": "^0.9.1",

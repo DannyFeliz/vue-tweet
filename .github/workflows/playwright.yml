@@ -4,6 +4,10 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
+  schedule:
+    # Weekly run: the live smoke tests guard against Twitter-side changes
+    # (widgets.js behavior, embed markup) even when the repo is quiet
+    - cron: '0 6 * * 1'
 jobs:
   test:
     timeout-minutes: 60
