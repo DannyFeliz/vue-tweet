@@ -4,6 +4,9 @@ Vue 3 component that lets you embed tweets in your app by only providing the twe
 
 [<img src="https://img.shields.io/npm/dt/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
 [<img src="https://img.shields.io/npm/v/vue-tweet.svg">](https://www.npmjs.com/package/vue-tweet)
+[<img src="https://github.com/DannyFeliz/vue-tweet/actions/workflows/playwright.yml/badge.svg">](https://github.com/DannyFeliz/vue-tweet/actions/workflows/playwright.yml)
+[<img src="https://img.shields.io/bundlephobia/minzip/vue-tweet">](https://bundlephobia.com/package/vue-tweet)
+[<img src="https://img.shields.io/npm/l/vue-tweet.svg">](https://github.com/DannyFeliz/vue-tweet/blob/main/LICENSE)
 
 ## Demo
 
@@ -77,7 +80,7 @@ For detailed information about embedded tweet parameters, see the [Embedded Twee
 
 - **Type:** `string`
 - **Default:** `''`
-- **Description:** The tweet URL.
+- **Description:** The tweet URL. Share links copied from X work as-is, including query parameters (e.g. `https://x.com/user/status/123?s=20`). Both `twitter.com` and `x.com` URLs are supported.
 
 ### `cards`
 
@@ -129,13 +132,13 @@ For detailed information about embedded tweet parameters, see the [Embedded Twee
 
 ### `tweet-load-success`
 
-- **Type:** `(embedHtmlNode: HTMLElement) => void`
+- **Type:** `(embedHtmlNode: HTMLDivElement) => void`
 - **Description:** Emitted after successfully loading the tweet.
 
 ### `tweet-load-error`
 
 - **Type:** `(error: Error) => void`
-- **Description:** Emitted when an error occurs while trying to load the tweet.
+- **Description:** Emitted when an error occurs while trying to load the tweet — invalid props, a tweet that doesn't exist, or a failure to load Twitter's `widgets.js` script itself (e.g. blocked by the network).
 
 ## Slots
 
@@ -153,14 +156,38 @@ Slot for custom loading state.
 
 ### `error`
 
-Slot for custom error state.
+Slot for custom error state. It receives the `error` as a slot prop.
 
 ```vue
 <VueTweet tweet-id="20">
-  <template #error>
-    <span>Sorry, that tweet doesn't exist!</span>
+  <template #error="{ error }">
+    <span>Failed to load the tweet: {{ error?.message }}</span>
   </template>
 </VueTweet>
+```
+
+## Exposed Methods
+
+### `reload()`
+
+Re-runs tweet rendering. Useful for a "Retry" button in the error slot:
+
+```vue
+<script setup>
+import { useTemplateRef } from 'vue'
+import VueTweet from 'vue-tweet'
+
+const tweetRef = useTemplateRef('tweet')
+</script>
+
+<template>
+  <VueTweet ref="tweet" tweet-id="1530240085807054848">
+    <template #error="{ error }">
+      <p>{{ error?.message }}</p>
+      <button @click="tweetRef?.reload()">Retry</button>
+    </template>
+  </VueTweet>
+</template>
 ```
 
 ## Complete Example
@@ -221,6 +248,21 @@ npm run type-check
 
 # Lint files
 npm run lint
+
+# Run end-to-end tests (Playwright)
+npm test
+```
+
+## Nuxt / SSR
+
+The component is safe to import in SSR apps (it doesn't touch `window` until it's mounted), but the tweet itself renders client-side. In Nuxt, wrap it in `<ClientOnly>`:
+
+```vue
+<template>
+  <ClientOnly>
+    <VueTweet tweet-id="1530240085807054848" />
+  </ClientOnly>
+</template>
 ```
 
 ## TypeScript Support
@@ -228,7 +270,12 @@ npm run lint
 This package includes TypeScript definitions. You can import the component and types:
 
 ```typescript
-import VueTweet, { type TweetProps, type TweetLang } from 'vue-tweet'
+import VueTweet, {
+  type TweetProps,
+  type TweetLang,
+  type TweetTheme,       // 'light' | 'dark' | 'system'
+  type TweetWidgetTheme, // 'light' | 'dark'
+} from 'vue-tweet'
 ```
 
 ## Contributing
