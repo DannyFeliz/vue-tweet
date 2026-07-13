@@ -1,0 +1,41 @@
+name: Bug report
+description: Something isn't working as expected
+labels: [bug]
+body:
+  - type: input
+    id: tweet
+    attributes:
+      label: Tweet ID or URL
+      description: The tweet you were trying to embed when the problem occurred.
+      placeholder: "https://x.com/vuejs/status/1753678159067881809"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead? Include the `tweet-load-error` message if one was emitted.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: A minimal snippet or a link to a repro (CodeSandbox, StackBlitz, repo).
+      render: vue
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: vue-tweet, Vue, and browser versions.
+      placeholder: "vue-tweet 3.0.0, Vue 3.5.39, Chrome 138"
+    validations:
+      required: true
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Client-side only (Vite, CRA, etc.)
+        - Nuxt / SSR
+        - Other
+    validations:
+      required: true
